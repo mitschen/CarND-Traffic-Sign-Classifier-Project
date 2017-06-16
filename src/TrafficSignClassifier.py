@@ -610,7 +610,7 @@ class TrafficSignClassifier():
                 #let's have a try on the testset
                 testset_accuracy = self.__EvaluateCNN( self.X_test, self.y_test)
                 self.logger.log("Instance {0:d}: On testdata we're achieving accuracy = {1:.3f}".format(self.id, testset_accuracy))
-                self.__markdown_tableContent+="Testing {:.3f}".format(validation_accuracy)
+                self.__markdown_tableContent+="Testing {:.3f}".format(testset_accuracy)
             
             if(storeNet == True):
                 tf.train.Saver().save(sess, './tsc_cfg_'+str(self.id))
@@ -704,7 +704,7 @@ if __name__ == '__main__':
                               "fc2" : 84,
                               "labels" : 43,
                               c_epoch : 15,
-                              c_learningrate : 0.0005
+                              c_learningrate : 0.001
                             },
                             {  
                               # filter shape + stride          maxpooling filter shape and stride
@@ -811,7 +811,15 @@ if __name__ == '__main__':
                               "labels" : 43,
                               c_epoch : 15,
                               c_learningrate : 0.0005
-                            } 
+                            },
+                            { 
+                              # filter shape + stride          maxpooling filter shape and stride
+                              "cv1" : ([5,5,3,32], [1,1,1,1]), "p1" : ([1,2,2,1], [1,2,2,1]),
+                              "cv2" : ([5,5,32,43], [1,1,1,1]), "p2" : ([1,2,2,1], [1,2,2,1]),
+                              "labels" : 43,
+                              c_epoch : 15,
+                              c_learningrate : 0.001
+                            }, 
                            ]
     myTestimages = [ ("13_yield.bmp", 13), ("14_stop.bmp", 14), 
                      ("15_noEntry.bmp", 15), ("17_oneway.bmp", 17),
@@ -829,7 +837,7 @@ if __name__ == '__main__':
     
     TrafficSignClassifier.dataAugmentation(1500)
     log = Logger("../results.txt", True)
-    finalCfg = lenet_configuration[0]
+    finalCfg = lenet_configuration[len(lenet_configuration)-1]
     tsc = TrafficSignClassifier(finalCfg, log.getLogger(1));
     tsc.normalize_zeroMeanData()
     tsc.TrainCNN(True)

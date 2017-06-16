@@ -1430,3 +1430,912 @@ Instance 1: Validation Accuracy = 0.702
 EPOCH 15 ...
 Instance 1: Validation Accuracy = 0.753
 Saved session in ./tsc_cfg_1
+
+2017-06-16 17:04:58.607452
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+LearnRate 0.001000
+EpochCnt 15\BatchSize 128
+
+Keep Prop FC1 0.5 Keep Prop FC2 0.5
+Training...
+EPOCH 1 ...
+Instance 1: Validation Accuracy = 0.053
+EPOCH 2 ...
+Instance 1: Validation Accuracy = 0.080
+EPOCH 3 ...
+Instance 1: Validation Accuracy = 0.090
+EPOCH 4 ...
+Instance 1: Validation Accuracy = 0.214
+EPOCH 5 ...
+Instance 1: Validation Accuracy = 0.339
+EPOCH 6 ...
+Instance 1: Validation Accuracy = 0.428
+EPOCH 7 ...
+Instance 1: Validation Accuracy = 0.487
+EPOCH 8 ...
+Instance 1: Validation Accuracy = 0.547
+EPOCH 9 ...
+Instance 1: Validation Accuracy = 0.588
+EPOCH 10 ...
+Instance 1: Validation Accuracy = 0.616
+EPOCH 11 ...
+Instance 1: Validation Accuracy = 0.668
+EPOCH 12 ...
+Instance 1: Validation Accuracy = 0.695
+EPOCH 13 ...
+Instance 1: Validation Accuracy = 0.713
+EPOCH 14 ...
+Instance 1: Validation Accuracy = 0.729
+EPOCH 15 ...
+Instance 1: Validation Accuracy = 0.720
+Saved session in ./tsc_cfg_1
+
+2017-06-16 17:17:19.469968
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 17:33:17.587071
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+LearnRate 0.001000
+EpochCnt 15\BatchSize 128
+
+Keep Prop FC1 0.5 Keep Prop FC2 0.5
+Training...
+EPOCH 1 ...
+Instance 1: Validation Accuracy = 0.530
+EPOCH 2 ...
+Instance 1: Validation Accuracy = 0.733
+EPOCH 3 ...
+Instance 1: Validation Accuracy = 0.872
+EPOCH 4 ...
+Instance 1: Validation Accuracy = 0.892
+EPOCH 5 ...
+Instance 1: Validation Accuracy = 0.910
+EPOCH 6 ...
+Instance 1: Validation Accuracy = 0.939
+EPOCH 7 ...
+Instance 1: Validation Accuracy = 0.937
+EPOCH 8 ...
+Instance 1: Validation Accuracy = 0.949
+EPOCH 9 ...
+Instance 1: Validation Accuracy = 0.950
+EPOCH 10 ...
+Instance 1: Validation Accuracy = 0.950
+EPOCH 11 ...
+Instance 1: Validation Accuracy = 0.954
+EPOCH 12 ...
+Instance 1: Validation Accuracy = 0.959
+EPOCH 13 ...
+Instance 1: Validation Accuracy = 0.959
+EPOCH 14 ...
+Instance 1: Validation Accuracy = 0.964
+EPOCH 15 ...
+Instance 1: Validation Accuracy = 0.955
+Instance 1: On testdata we're achieving accuracy = 0.943
+Saved session in ./tsc_cfg_1
+
+2017-06-16 17:40:31.581955
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 17:41:17.714142
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 17:41:53.984111
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 17:42:44.990354
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 17:43:08.746603
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 17:44:45.975443
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 17:46:45.275805
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 17:47:04.468395
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 18:33:09.340515
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 18:34:08.476364
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 18:37:01.373261
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 18:38:54.687190
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 18:39:10.126499
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 18:44:58.986635
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 19:02:57.287864
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+
+2017-06-16 19:04:51.456454
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+LearnRate 0.001000
+EpochCnt 15\BatchSize 128
+
+Keep Prop FC1 0.5 Keep Prop FC2 0.5
+Training...
+EPOCH 1 ...
+Instance 1: Validation Accuracy = 0.012
+EPOCH 2 ...
+Instance 1: Validation Accuracy = 0.048
+EPOCH 3 ...
+Instance 1: Validation Accuracy = 0.039
+EPOCH 4 ...
+Instance 1: Validation Accuracy = 0.037
+EPOCH 5 ...
+Instance 1: Validation Accuracy = 0.042
+EPOCH 6 ...
+Instance 1: Validation Accuracy = 0.046
+EPOCH 7 ...
+Instance 1: Validation Accuracy = 0.051
+EPOCH 8 ...
+Instance 1: Validation Accuracy = 0.060
+EPOCH 9 ...
+Instance 1: Validation Accuracy = 0.035
+EPOCH 10 ...
+Instance 1: Validation Accuracy = 0.056
+EPOCH 11 ...
+Instance 1: Validation Accuracy = 0.054
+EPOCH 12 ...
+Instance 1: Validation Accuracy = 0.048
+EPOCH 13 ...
+Instance 1: Validation Accuracy = 0.055
+EPOCH 14 ...
+Instance 1: Validation Accuracy = 0.062
+EPOCH 15 ...
+Instance 1: Validation Accuracy = 0.043
+Saved session in ./tsc_cfg_1
+
+2017-06-16 19:12:59.538223
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+LearnRate 0.001000
+EpochCnt 15\BatchSize 128
+
+Keep Prop FC1 0.5 Keep Prop FC2 0.5
+Training...
+EPOCH 1 ...
+Instance 1: Validation Accuracy = 0.038
+EPOCH 2 ...
+Instance 1: Validation Accuracy = 0.034
+EPOCH 3 ...
+Instance 1: Validation Accuracy = 0.022
+EPOCH 4 ...
+Instance 1: Validation Accuracy = 0.025
+EPOCH 5 ...
+Instance 1: Validation Accuracy = 0.037
+EPOCH 6 ...
+Instance 1: Validation Accuracy = 0.057
+EPOCH 7 ...
+Instance 1: Validation Accuracy = 0.073
+EPOCH 8 ...
+Instance 1: Validation Accuracy = 0.070
+EPOCH 9 ...
+Instance 1: Validation Accuracy = 0.074
+EPOCH 10 ...
+Instance 1: Validation Accuracy = 0.076
+EPOCH 11 ...
+Instance 1: Validation Accuracy = 0.067
+EPOCH 12 ...
+Instance 1: Validation Accuracy = 0.076
+EPOCH 13 ...
+Instance 1: Validation Accuracy = 0.094
+EPOCH 14 ...
+Instance 1: Validation Accuracy = 0.090
+EPOCH 15 ...
+Instance 1: Validation Accuracy = 0.087
+Saved session in ./tsc_cfg_1
+Restore session in ./tsc_cfg_1
+
+2017-06-16 19:30:34.658900
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.200
+Top K evaluation
+
+2017-06-16 19:32:51.531537
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.200
+Top K evaluation
+
+2017-06-16 19:42:18.534720
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.200
+Top K evaluation
+
+2017-06-16 19:43:52.864172
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.200
+Top K evaluation
+
+2017-06-16 19:49:43.686725
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.200
+Top K evaluation
+
+2017-06-16 20:07:02.296924
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+LearnRate 0.001000
+EpochCnt 15\BatchSize 128
+
+Keep Prop FC1 0.5 Keep Prop FC2 0.5
+Training...
+EPOCH 1 ...
+Instance 1: Validation Accuracy = 0.586
+EPOCH 2 ...
+Instance 1: Validation Accuracy = 0.785
+EPOCH 3 ...
+Instance 1: Validation Accuracy = 0.873
+EPOCH 4 ...
+Instance 1: Validation Accuracy = 0.920
+EPOCH 5 ...
+Instance 1: Validation Accuracy = 0.923
+EPOCH 6 ...
+Instance 1: Validation Accuracy = 0.925
+EPOCH 7 ...
+Instance 1: Validation Accuracy = 0.940
+EPOCH 8 ...
+Instance 1: Validation Accuracy = 0.931
+EPOCH 9 ...
+Instance 1: Validation Accuracy = 0.952
+EPOCH 10 ...
+Instance 1: Validation Accuracy = 0.950
+EPOCH 11 ...
+Instance 1: Validation Accuracy = 0.957
+EPOCH 12 ...
+Instance 1: Validation Accuracy = 0.962
+EPOCH 13 ...
+Instance 1: Validation Accuracy = 0.966
+EPOCH 14 ...
+Instance 1: Validation Accuracy = 0.954
+EPOCH 15 ...
+Instance 1: Validation Accuracy = 0.963
+Instance 1: On testdata we're achieving accuracy = 0.948
+Saved session in ./tsc_cfg_1
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.800
+Top K evaluation
+
+2017-06-16 20:18:41.028871
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.800
+Top K evaluation
+Label 13 identified as 0.9999980926513672, 1.8373526700088405e-06 with propability of (0.9999996423721313,2.874620008697093e-07)
+Label 14 identified as 14, 17 with propability of (13,2)
+
+2017-06-16 20:21:08.082755
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.800
+Top K evaluation
+Label 13 identified as 13, 2 with propability of (0.9999996423721313,2.874620008697093e-07)
+Label 14 identified as 14, 17 with propability of (0.9999980926513672,1.8373526700088405e-06)
+Label 15 identified as 15, 9 with propability of (0.9999619722366333,3.798526813625358e-05)
+Label 17 identified as 17, 14 with propability of (0.6568096876144409,0.338985800743103)
+Label 33 identified as 37, 40 with propability of (0.8572394847869873,0.14026671648025513)
+
+2017-06-16 20:21:47.299323
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.800
+Top K evaluation
+Label 13 identified as 13, 2 with propability of (1.00,0.00)
+Label 14 identified as 14, 17 with propability of (1.00,0.00)
+Label 15 identified as 15, 9 with propability of (1.00,0.00)
+Label 17 identified as 17, 14 with propability of (0.66,0.34)
+Label 33 identified as 37, 40 with propability of (0.86,0.14)
+
+2017-06-16 20:22:14.191141
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.800
+Top K evaluation
+Label 13 identified as 13, 2 with propability of (1.000,0.000)
+Label 14 identified as 14, 17 with propability of (1.000,0.000)
+Label 15 identified as 15, 9 with propability of (1.000,0.000)
+Label 17 identified as 17, 14 with propability of (0.657,0.339)
+Label 33 identified as 37, 40 with propability of (0.857,0.140)
+
+2017-06-16 20:22:38.693586
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.800
+Top K evaluation
+Label 13 identified as 13, 2 with propability of (1.00,0.00)
+Label 14 identified as 14, 17 with propability of (1.00,0.00)
+Label 15 identified as 15, 9 with propability of (1.00,0.00)
+Label 17 identified as 17, 14 with propability of (0.66,0.34)
+Label 33 identified as 37, 40 with propability of (0.86,0.14)
+
+2017-06-16 20:46:02.360120
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+LearnRate 0.001000
+EpochCnt 15\BatchSize 128
+
+Keep Prop FC1 0.5 Keep Prop FC2 0.5
+Training...
+EPOCH 1 ...
+Instance 1: Validation Accuracy = 0.744
+EPOCH 2 ...
+Instance 1: Validation Accuracy = 0.892
+EPOCH 3 ...
+Instance 1: Validation Accuracy = 0.923
+EPOCH 4 ...
+Instance 1: Validation Accuracy = 0.933
+EPOCH 5 ...
+Instance 1: Validation Accuracy = 0.929
+EPOCH 6 ...
+Instance 1: Validation Accuracy = 0.948
+EPOCH 7 ...
+Instance 1: Validation Accuracy = 0.946
+EPOCH 8 ...
+Instance 1: Validation Accuracy = 0.951
+EPOCH 9 ...
+Instance 1: Validation Accuracy = 0.944
+EPOCH 10 ...
+Instance 1: Validation Accuracy = 0.955
+EPOCH 11 ...
+Instance 1: Validation Accuracy = 0.958
+EPOCH 12 ...
+Instance 1: Validation Accuracy = 0.957
+EPOCH 13 ...
+Instance 1: Validation Accuracy = 0.958
+EPOCH 14 ...
+Instance 1: Validation Accuracy = 0.956
+EPOCH 15 ...
+Instance 1: Validation Accuracy = 0.957
+Instance 1: On testdata we're achieving accuracy = 0.948
+Saved session in ./tsc_cfg_1
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.600
+Top K evaluation
+Label 13 identified as 10, 13 with propability of (0.62,0.38)
+Label 14 identified as 14, 17 with propability of (0.95,0.05)
+Label 15 identified as 15, 13 with propability of (1.00,0.00)
+Label 17 identified as 17, 14 with propability of (1.00,0.00)
+Label 33 identified as 37, 40 with propability of (1.00,0.00)
+
+2017-06-16 21:17:57.307928
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+LearnRate 0.001000
+EpochCnt 15\BatchSize 128
+
+Keep Prop FC1 0.5 Keep Prop FC2 0.5
+Training...
+EPOCH 1 ...
+Instance 1: Validation Accuracy = 0.032
+EPOCH 2 ...
+Instance 1: Validation Accuracy = 0.052
+EPOCH 3 ...
+Instance 1: Validation Accuracy = 0.035
+EPOCH 4 ...
+Instance 1: Validation Accuracy = 0.055
+EPOCH 5 ...
+Instance 1: Validation Accuracy = 0.068
+EPOCH 6 ...
+Instance 1: Validation Accuracy = 0.072
+EPOCH 7 ...
+Instance 1: Validation Accuracy = 0.085
+EPOCH 8 ...
+Instance 1: Validation Accuracy = 0.087
+EPOCH 9 ...
+Instance 1: Validation Accuracy = 0.098
+EPOCH 10 ...
+Instance 1: Validation Accuracy = 0.097
+EPOCH 11 ...
+Instance 1: Validation Accuracy = 0.088
+EPOCH 12 ...
+Instance 1: Validation Accuracy = 0.094
+EPOCH 13 ...
+Instance 1: Validation Accuracy = 0.095
+EPOCH 14 ...
+Instance 1: Validation Accuracy = 0.093
+EPOCH 15 ...
+Instance 1: Validation Accuracy = 0.094
+Saved session in ./tsc_cfg_1
+5x5 3->32|
+2 2|
+14x14x32|
+5x5 32->43|
+2 2|
+5x5x43|
+-|
+-|
+-|
+1075->120, dropOut = 0.5
+120->84, dropOut = 0.5
+84->43
+Validating 0.094
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.000
+Top K evaluation
+Label 13 identified as 9, 16 with propability of (0.04,0.04)
+Label 14 identified as 16, 38 with propability of (0.04,0.04)
+Label 15 identified as 22, 18 with propability of (0.03,0.03)
+Label 17 identified as 14, 16 with propability of (0.04,0.03)
+Label 33 identified as 35, 36 with propability of (0.05,0.05)
+
+2017-06-16 21:23:35.639526
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+LearnRate 0.001000
+EpochCnt 15\BatchSize 128
+
+Keep Prop FC1 0.5 Keep Prop FC2 0.5
+Training...
+EPOCH 1 ...
+Instance 1: Validation Accuracy = 0.037
+EPOCH 2 ...
+Instance 1: Validation Accuracy = 0.017
+EPOCH 3 ...
+Instance 1: Validation Accuracy = 0.014
+EPOCH 4 ...
+Instance 1: Validation Accuracy = 0.011
+EPOCH 5 ...
+Instance 1: Validation Accuracy = 0.014
+EPOCH 6 ...
+Instance 1: Validation Accuracy = 0.027
+EPOCH 7 ...
+Instance 1: Validation Accuracy = 0.022
+EPOCH 8 ...
+Instance 1: Validation Accuracy = 0.022
+EPOCH 9 ...
+Instance 1: Validation Accuracy = 0.024
+EPOCH 10 ...
+Instance 1: Validation Accuracy = 0.034
+EPOCH 11 ...
+Instance 1: Validation Accuracy = 0.045
+EPOCH 12 ...
+Instance 1: Validation Accuracy = 0.054
+EPOCH 13 ...
+Instance 1: Validation Accuracy = 0.056
+EPOCH 14 ...
+Instance 1: Validation Accuracy = 0.053
+EPOCH 15 ...
+Instance 1: Validation Accuracy = 0.049
+Saved session in ./tsc_cfg_1
+Conv1 : 5x5 3->32|
+MPool1: 2x2|
+Shape1: 14x14x32|
+Conv2 : 5x5 32->43|
+MPool2: 2x2|
+Shape2: 5x5x43|
+Conv3 : -|
+MPool3: -|
+Shape3: -|
+FC1   : 1075->120, dropOut = 0.5
+FC2   : 120->84, dropOut = 0.5
+FC3   : 84->43
+Validating 0.049
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.200
+Top K evaluation
+Label 13 identified as 41, 14 with propability of (0.03,0.03)
+Label 14 identified as 14, 17 with propability of (0.04,0.04)
+Label 15 identified as 39, 29 with propability of (0.03,0.03)
+Label 17 identified as 12, 14 with propability of (0.03,0.03)
+Label 33 identified as 34, 39 with propability of (0.12,0.05)
+
+2017-06-16 21:49:59.824737
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 120
+ FC2 84
+ FC3 43
+LearnRate 0.000500
+EpochCnt 15\BatchSize 128
+
+Keep Prop FC1 0.5 Keep Prop FC2 0.5
+Training...
+EPOCH 1 ...
+Instance 1: Validation Accuracy = 0.563
+EPOCH 2 ...
+Instance 1: Validation Accuracy = 0.768
+EPOCH 3 ...
+Instance 1: Validation Accuracy = 0.829
+EPOCH 4 ...
+Instance 1: Validation Accuracy = 0.896
+EPOCH 5 ...
+Instance 1: Validation Accuracy = 0.922
+EPOCH 6 ...
+Instance 1: Validation Accuracy = 0.938
+EPOCH 7 ...
+Instance 1: Validation Accuracy = 0.934
+EPOCH 8 ...
+Instance 1: Validation Accuracy = 0.942
+EPOCH 9 ...
+Instance 1: Validation Accuracy = 0.945
+EPOCH 10 ...
+Instance 1: Validation Accuracy = 0.955
+EPOCH 11 ...
+Instance 1: Validation Accuracy = 0.951
+EPOCH 12 ...
+Instance 1: Validation Accuracy = 0.947
+EPOCH 13 ...
+Instance 1: Validation Accuracy = 0.948
+EPOCH 14 ...
+Instance 1: Validation Accuracy = 0.951
+EPOCH 15 ...
+Instance 1: Validation Accuracy = 0.955
+Instance 1: On testdata we're achieving accuracy = 0.946
+Saved session in ./tsc_cfg_1
+Conv1 : 5x5 3->32|
+MPool1: 2x2|
+Shape1: 14x14x32|
+Conv2 : 5x5 32->43|
+MPool2: 2x2|
+Shape2: 5x5x43|
+Conv3 : -|
+MPool3: -|
+Shape3: -|
+FC1   : 1075->120, dropOut = 0.5
+FC2   : 120->84, dropOut = 0.5
+FC3   : 84->43
+Validating 0.955Testing 0.955
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.800
+Top K evaluation
+Label 13 identified as 13, 25 with propability of (1.00,0.00)
+Label 14 identified as 14, 12 with propability of (1.00,0.00)
+Label 15 identified as 15, 3 with propability of (1.00,0.00)
+Label 17 identified as 17, 14 with propability of (1.00,0.00)
+Label 33 identified as 37, 39 with propability of (1.00,0.00)
+
+2017-06-16 22:16:58.037181
+Entity 1:
+1 Create Instance
+ CV1 ([5, 5, 3, 32], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV1 - Shape (?, 14, 14, 32)
+ CV2 ([5, 5, 32, 43], [1, 1, 1, 1])MaxP ([1, 2, 2, 1], [1, 2, 2, 1])
+ CV2 - Shape (?, 5, 5, 43)
+ FC1 328
+ FC2 229
+ FC3 43
+LearnRate 0.001000
+EpochCnt 15\BatchSize 128
+
+Keep Prop FC1 0.5 Keep Prop FC2 0.5
+Training...
+EPOCH 1 ...
+Instance 1: Validation Accuracy = 0.808
+EPOCH 2 ...
+Instance 1: Validation Accuracy = 0.898
+EPOCH 3 ...
+Instance 1: Validation Accuracy = 0.915
+EPOCH 4 ...
+Instance 1: Validation Accuracy = 0.938
+EPOCH 5 ...
+Instance 1: Validation Accuracy = 0.952
+EPOCH 6 ...
+Instance 1: Validation Accuracy = 0.950
+EPOCH 7 ...
+Instance 1: Validation Accuracy = 0.946
+EPOCH 8 ...
+Instance 1: Validation Accuracy = 0.953
+EPOCH 9 ...
+Instance 1: Validation Accuracy = 0.959
+EPOCH 10 ...
+Instance 1: Validation Accuracy = 0.944
+EPOCH 11 ...
+Instance 1: Validation Accuracy = 0.952
+EPOCH 12 ...
+Instance 1: Validation Accuracy = 0.948
+EPOCH 13 ...
+Instance 1: Validation Accuracy = 0.958
+EPOCH 14 ...
+Instance 1: Validation Accuracy = 0.956
+EPOCH 15 ...
+Instance 1: Validation Accuracy = 0.965
+Instance 1: On testdata we're achieving accuracy = 0.945
+Saved session in ./tsc_cfg_1
+Conv1 : 5x5 3->32|
+MPool1: 2x2|
+Shape1: 14x14x32|
+Conv2 : 5x5 32->43|
+MPool2: 2x2|
+Shape2: 5x5x43|
+Conv3 : -|
+MPool3: -|
+Shape3: -|
+FC1   : 1075->328, dropOut = 0.5
+FC2   : 328->229, dropOut = 0.5
+FC3   : 229->43
+Validating 0.965Testing 0.965
+Restore session in ./tsc_cfg_1
+analyzeCustomData (custom) = 0.800
+Top K evaluation
+Label 13 identified as 13, 38 with propability of (1.00,0.00)
+Label 14 identified as 14, 12 with propability of (1.00,0.00)
+Label 15 identified as 15, 13 with propability of (1.00,0.00)
+Label 17 identified as 17, 14 with propability of (1.00,0.00)
+Label 33 identified as 39, 37 with propability of (0.97,0.03)
