@@ -24,6 +24,7 @@ import datetime
 
 
 import scipy.ndimage  
+import scipy.misc
 
 C_TESTFILENAME = "test.p"
 C_TRAINFILENAME = "train.p"
@@ -55,7 +56,7 @@ class Logger():
         self.__filepath = outfile
         self.__content = {}
         self.__toConsole = toConsole
-    
+        
     def __log(self, _id, data):
         with Logger.__mutexLock:
             if (_id in self.__content.keys()):
@@ -90,6 +91,8 @@ class TrafficSignClassifier():
     y_valid = None
     X_test = None
     y_test = None
+    X_custom = None
+    y_custom = None
     classes = None
     #values are getting initializes during __preAnalyzeData
     #for each label, a list of index to the corresponding trainingInput
@@ -145,11 +148,26 @@ class TrafficSignClassifier():
         assert(len(noClasses) == len(TrafficSignClassifier.classes.keys()))
         print("Files under ", os.path.abspath(filepath), "read\nwith size of (",TrafficSignClassifier.X_train.shape, TrafficSignClassifier.X_valid.shape, TrafficSignClassifier.X_test.shape,")\n")
         TrafficSignClassifier.__printSummary()
+    
+    def importCustomImages(filepath, fileList):
+        #import custom bmp images and store them as
+        files = []
+        TrafficSignClassifier.y_custom = []
+        TrafficSignClassifier.X_custom = [] 
+        #compose fqnames and store the labels
+        for val in fileList:
+            files.append(os.path.join(filepath, val[0]))
+            TrafficSignClassifier.y_custom.append(val[1])
+        for f in files:
+            TrafficSignClassifier.X_custom.append(scipy.misc.imread(f))
+        TrafficSignClassifier.X_custom = np.array(TrafficSignClassifier.X_custom)
+        TrafficSignClassifier.y_custom = np.array(TrafficSignClassifier.y_custom)
         
     def __printSummary():
         #print a summary according to Jupyter Notebook requirements
         print("Basic Summary of the DataSet")
         print("\tNumber of training examples = ", TrafficSignClassifier.X_train.shape[0])
+        print("\tNumber of validation examples = ", TrafficSignClassifier.X_valid.shape[0])
         print("\tNumber of testing examples = ", TrafficSignClassifier.X_test.shape[0])
         print("\tImage data shape = ", (TrafficSignClassifier.X_train.shape[1], TrafficSignClassifier.X_train.shape[2]))
         print("\tNumber of classes = ", len(TrafficSignClassifier.classes.keys()))
@@ -165,7 +183,7 @@ class TrafficSignClassifier():
         distribution_array = np.empty(shape=(2, len(distribution.keys())), dtype=int)
         distribution_array[0] = list(map(int,distribution.keys()))
         distribution_array[1] = list(map(lambda x : len(x),distribution.values()))
-        
+
         plt.title("Number of testsamples")
         plt.bar(distribution_array[0], distribution_array[1])
         plt.xlabel('ClassId')
@@ -262,18 +280,24 @@ class TrafficSignClassifier():
         for key in distribution:
             assert(0 < len(distribution[key]))
             index= distribution[key][0];
-            samples.append(TrafficSignClassifier.x_train[index, :, :, :])
-            labels.append(TrafficSignClassifier.classes[key])
-        assert(len(labels) == len(index))
+            samples.append(TrafficSignClassifier.X_train[index, :, :, :])
+            labels.append((key, TrafficSignClassifier.classes[str(key)][0]) )
+        assert(len(labels) == len(samples))
         
-        dim1 = math.ceil(len(labels) / 3.)
-        dim2 = 3
+        dim1 = math.ceil(len(labels) / 10.)
+        dim2 = 10
         
         figure = plt.figure()
-        for label, sample in enumerate(labels, samples):
+        index = 1
+        for label, sample in zip(labels, samples):
+            sample = sample.astype(np.uint8)
             image = sample.squeeze()
-            figure.add_subplot(dim1,dim2, label)
+            a = figure.add_subplot(dim1,dim2, index)
+            a.set_title(str(label[0]))
+            a.axis('off')
+            index+=1
             plt.imshow(image)
+        plt.subplots_adjust(hspace = 0.5)            
         plt.show()
         
         
@@ -284,7 +308,8 @@ class TrafficSignClassifier():
     simpleDataAugmentation = staticmethod(simpleDataAugmentation)
     dataAugmentation = staticmethod(dataAugmentation)
     __printSummary = staticmethod(__printSummary)
-    drawDataSetExample = staticmethod(drawDataSetExample) 
+    drawDataSetExample = staticmethod(drawDataSetExample)
+    importCustomImages = staticmethod(importCustomImages) 
 
 #/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 #_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
@@ -317,30 +342,6 @@ class TrafficSignClassifier():
         self.flag_isGrayScaled = False
         self.flag_isNormalized = False
     
-    
-        
-    def normalizeData(self):
-#         maxNoPatterns = 0
-#         for 
-#         self.X_train = np.pad(self.X_train, ((0,0), (0,0), (2,2), (2,2)), 'constant')
-#         print (self.X_train.shape)
-#         for x in range (1 ,15):
-#             example = self.X_train[300+x*2,:,:,:]
-            example = self.X_train[1,:,:,:]
-            
-            example = np.pad(example,  ((2,2), (2,2), (0,0)), 'edge')
-            print (example.shape)
-            image = example.squeeze()
-            image2 = np.flip(example, 1).squeeze()
-            fig = plt.figure()
-            fig.add_subplot(2,1,1)
-            #f1 = plt.figure(figsize=(1,1))
-            plt.imshow(image)
-            fig.add_subplot(2,1,2)
-            #f2 = plt.figure(figsize=(1,2))
-            plt.imshow(image2)
-            plt.show()
-            
     def normalize_zeroMeanData(self):
         #adjust the samples so that they have a zero mean
         self.X_test -= 128
@@ -382,31 +383,9 @@ class TrafficSignClassifier():
         self.X_test = self.X_test[..., np.newaxis]
         
         self.flag_isGrayScaled = True
-        
-#         example = self.X_train[0].astype(np.uint8)
-#         image = example.squeeze()
-# 
-#         plt.figure()
-#         plt.imshow(image, cmap='gray')
-#         plt.show()
-#         example2 = np.copy(example.astype(np.float32))
-#         example2 = example2[:,:,0] * c_redFraction + example2[:,:,1] * c_greenFraction + example2[:,:,2] * c_blueFraction;
-#         print (example2.shape)
-#         image2 = np.copy(example2.squeeze().astype(np.uint8))
-#         
-#         fig = plt.figure()
-#         fig.add_subplot(2,1,1)
-#         plt.imshow(image)
-#         fig.add_subplot(2,1,2)
-#         plt.imshow(image2, cmap='gray')
-#         plt.show()
-        
           
     def drawImage(self):
         example = self.X_train[0].astype(np.uint8)
-#         example = scipy.ndimage.interpolation.shift(example,  (2., 2., 0.), mode='nearest')
-#         example = scipy.ndimage.interpolation.rotate(example, 15., reshape=False, mode='nearest')
-#         print(example.shape)
         image = example.squeeze()
 
         plt.figure()
@@ -518,7 +497,7 @@ class TrafficSignClassifier():
         return logits    
     
         
-    def TrainCNN(self, cfg):
+    def TrainCNN(self, cfg, storeNet = False):
         #input data is 32x32 x 3 (depth)
         if(self.flag_isGrayScaled == True):
             self.phX = tf.placeholder(tf.float32, (None, self.X_train.shape[1], self.X_train.shape[2], 1))
@@ -562,17 +541,22 @@ class TrafficSignClassifier():
                     batch_x, batch_y = X_train[offset:end], y_train[offset:end]
                     sess.run(training_operation, feed_dict={self.phX: batch_x, self.phY: batch_y, self.fc1_kp:keep_prop1, self.fc2_kp:keep_prop2})
                 
-                validation_accuracy = self.__EvaluateCNN(cfg, self.X_valid, self.y_valid)
+                validation_accuracy = self.__EvaluateCNN(self.X_valid, self.y_valid)
                 self.logger.log("EPOCH {} ...".format(i+1))
                 self.logger.log("Instance {0:d}: Validation Accuracy = {1:.3f}".format(self.id, validation_accuracy))
                 self.logger.log()
             if (validation_accuracy > 0.93):
                 #let's have a try on the testset
-                testset_accuracy = self.__EvaluateCNN(cfg, self.X_test, self.y_test)
+                testset_accuracy = self.__EvaluateCNN( self.X_test, self.y_test)
                 self.logger.log("Instance {0:d}: On testdata we're achieving accuracy = {1:.3f}".format(self.id, testset_accuracy))
+            
+            if(storeNet == True):
+                tf.train.Saver().save(sess, './tsc_cfg_'+str(self.id))
+                self.logger.log("Saved session in ./tsc_cfg_"+str(self.id))
+            
 
-    def __EvaluateCNN(self, cfg, X_data, y_data):
-        BATCH_SIZE = 128 if c_batchsize not in cfg.keys() else cfg[c_batchsize]
+    def __EvaluateCNN(self, X_data, y_data):
+        BATCH_SIZE = 128# if c_batchsize not in cfg.keys() else cfg[c_batchsize]
         correct_prediction = tf.equal(tf.argmax(self.logits, 1), tf.argmax(self.one_hot_y, 1))
         accuracy_operation = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
         #saver = tf.train.Saver()
@@ -587,7 +571,16 @@ class TrafficSignClassifier():
             total_accuracy += (accuracy * len(batch_x))
         return total_accuracy / num_examples        
         
-
+    def analyzeCustomData(self, X_data, y_data):
+        with tf.Session() as sess:
+            fileToRestore = './tsc_cfg_'+str(self.id)
+            print (fileToRestore)
+            new_saver = tf.train.import_meta_graph(fileToRestore+'.meta')
+            #tf.train.Saver().restore(sess, fileToRestore)
+            new_saver.restore(sess, tf.train.latest_checkpoint('./'))
+            #tf.train.Saver().restore(tf.train.latest_checkpoint('.'))
+            test_accuracy = self.__EvaluateCNN(X_data, y_data)
+            print ("Test Accuracy = {:.3f}".format(test_accuracy))
 
 
 
@@ -599,7 +592,6 @@ class aThread(threading.Thread):
     def run(self):
         #self.__tsc.convertToGrayScale_luminosity()
         self.__tsc.normalize_zeroMeanData()
-        
         self.__tsc.TrainCNN(self.__cfg)
 
 
@@ -612,11 +604,10 @@ c_epoch = "epoch"                 #default is 10
 c_batchsize = "batch"             #default is 128
 c_keep_prop1 = "kp1"              #default is 0.5
 c_keep_prop2 = "kp2"              #default is 0.5
-if __name__ == '__main__':
 
-    
+
+if __name__ == '__main__':
     lenet_configuration = [ 
-        
                             { 
                               # filter shape + stride          maxpooling filter shape and stride
                               "cv1" : ([5,5,3,32], [1,1,1,1]), "p1" : ([1,2,2,1], [1,2,2,1]),
@@ -735,18 +726,37 @@ if __name__ == '__main__':
                               c_learningrate : 0.0005
                             } 
                            ]
+    myTestimages = [ ("13_yield.bmp", 13), ("14_stop.bmp", 14), 
+                     ("15_noEntry.bmp", 15), ("17_oneway.bmp", 17),
+                     ("33_turnRight.bmp", 33)]
     
     myThreads = []
     
+    start = time.clock()
     TrafficSignClassifier.importData("../")
-    TrafficSignClassifier.dataAugmentation(1000)
+    TrafficSignClassifier.importCustomImages("../examples", myTestimages)
     
+    #TrafficSignClassifier.preAnalyzeData()
+    #TrafficSignClassifier.drawDataSetExample()
+    #TrafficSignClassifier.dataAugmentation(1000)
+    
+    TrafficSignClassifier.dataAugmentation(100)
     log = Logger("../results.txt", True)
+    finalCfg = lenet_configuration[0]
+    tsc = TrafficSignClassifier(log.getLogger(1));
+    tsc.normalize_zeroMeanData()
+    tsc.TrainCNN(finalCfg, True)
+    tsc.analyzeCustomData(TrafficSignClassifier.X_custom, TrafficSignClassifier.y_custom)
+    log.dump()
+    print ("Time elapsed ", math.ceil((time.clock() - start)/60) )
+    exit(0)
+    
     for config in range(0, len(lenet_configuration)):
         start = time.clock()
         tsc = TrafficSignClassifier(log.getLogger(config));
         tsc.normalize_zeroMeanData()
         tsc.TrainCNN(lenet_configuration[config])
+# Disable multithreading procedure - my machine is to slow for that         
 #         tsc1 = aThread(TrafficSignClassifier(log.getLogger(config)), lenet_configuration[config])
 #         tsc2 = aThread(TrafficSignClassifier(log.getLogger(config)), lenet_configuration[config+1])
 #         myThreads.append(tsc1)
@@ -758,20 +768,6 @@ if __name__ == '__main__':
         elapsed = (time.clock() - start)
         log.dump()
         print ("Time elapsed ", math.ceil(elapsed/60) , " Round " , config)
-    
-        
-    
-#     tsc1.importData("../")
-#     tsc2.importData("../")
-    
-    #tsc.preAnalyzeData()
-    #tsc.normalizeData()
-    #tsc.shuffleTraining()
-    
-    
-    #tsc = TrafficSignClassifier(False)
-    #tsc.importData("../")
-    #tsc.TrainCNN(lenet_configuration[1])
     pass
 
 

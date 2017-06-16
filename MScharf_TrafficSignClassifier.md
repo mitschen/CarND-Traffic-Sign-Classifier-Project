@@ -19,7 +19,7 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 
 [image1]: ./examples/testsample_distribution.jpeg "Visualization"
-[image2]: ./examples/grayscale.jpg "Grayscaling"
+[image2]: ./examples/labels.jpeg "Example of the roadsigns"
 [image3]: ./examples/random_noise.jpg "Random Noise"
 [image4]: ./examples/placeholder.png "Traffic Sign 1"
 [image5]: ./examples/placeholder.png "Traffic Sign 2"
@@ -46,11 +46,13 @@ The TrafficSignClassifier.py contains 3 classes (the TrafficSignClassifier and t
 
 TSC contains some static as well as instance members. The intention behind the static members and functions is, that reading training-data as well as applying different transformations on this data should be done once, and then shared among all the configurations.
 
-As you can imaging: `X, Y train/valid/test` contains the testdata read from the file. The `classes` member contains the association between label 0-42 and the corresponding textual representation. The class is storing an overview of the samples for each label in the `trainingLabelSetIndex` - meaning for each label I've the index to a training sample. The class member `id` is used in the multithreaded environment to associate log-outputs with the corresponding configuration setup.
+As you can imaging: `X, Y train/valid/test/custom` contains the testdata read from the file. The `classes` member contains the association between label 0-42 and the corresponding textual representation. The class is storing an overview of the samples for each label in the `trainingLabelSetIndex` - meaning for each label I've the index to a training sample. The class member `id` is used in the multithreaded environment to associate log-outputs with the corresponding configuration setup.
 
 Let review in short the static class methods:
 ######importData(filepath):
 Searches in the `filepath` for the files test.p/train.p/vlaid.p and signames.csv and uses `pickle` and `csv.DictReader` to read the data to the static classmembers mentioned above. 
+######importCustomImages(filepath, fileList)
+This method will import my custom data I've taken from my surrounding. The fileList is a list of sets containing (filename, labelNbr)- expecting *.bmp files. These informations will be stored in the static members `X_custom`and `y_custom`.
 ######__printSummary():
 Provides a textual output based on the classmemebrs as expected by the jupyter notebook template in form of
 > Basic Summary of the DataSet
@@ -63,7 +65,6 @@ Please note - this member is intented to be private and will be get called autom
 
 ######preAnalyzeData()
 This method provides a graphical representation of the samples for each label - the figure below shows you the exact distribution of label - samples.
->**TODO**
 
 ![alt text][image1]
 
@@ -75,7 +76,7 @@ Again a private method which is getting called from other functions. In essence 
 The first try on augmentation was to simply adapt the number of samples for each label. This was done by identifying the label with the most samples and then cloning for each other label the samples so that at the end each label has the same number of test samples. During my testing I've figured out that beneath the drastically increased runtime, the performance of the CNN wasn't improving that good - so I decided to realize another function as described in the next section. 
 
 ######dataAugmentation(size = None)
-As mentioned - the number of testsamples isn't equal for each label. Therefore I've realized a method which will change the samples in the following way. The paremeter `size` is used to specify the number of each sample for each label - `None` means to set the sample count to the max sample count of the given testdata - in our case **TODO**.
+As mentioned - the number of testsamples isn't equal for each label. Therefore I've realized a method which will change the samples in the following way. The paremeter `size` is used to specify the number of each sample for each label - `None` means to set the sample count to the max sample count of the given testdata - in our case 2010.
 So what is happening in this function. For each lable I choose randomly `size` sample and then:
 * use the first sample as it is
 * use the second sample and rotate it for +15° without changing shape
@@ -84,6 +85,7 @@ So what is happening in this function. For each lable I choose randomly `size` s
 
 ######drawDataSetExample()
 Take for each lable one sample and draw it via matplot.
+![alt text][image2]
 
 
 #####instance members
@@ -129,11 +131,54 @@ In case that our validation accuraty reaches the 0.93 mark after training, we im
 ######__EvaluateCNN(self, cfg, X_data, y_data):
 Evaluation of the trained NN using the test data. In contrast to training we've associated the dropout keep propability to 1.0. The accuracy is given by comparing the NN result for a sample with the label for the sample - which is either true (1) or false (0). The mean of this comparision over all samples provides the overall accuracy.
 
-#####the confgiuration
+#####the configuration
+The TSC is configured during startup by a python dict which contains different parameters to optimize. Some of these parameters are optional and will be evaluated by the TSC himself.
+```
+c_learningrate = "learningrate"   #default is 0.001
+c_mu = "mu"                       # default is 0
+c_sigma = "sigma"                 #default is 0.1
+c_epoch = "epoch"                 #default is 10
+c_batchsize = "batch"             #default is 128
+c_keep_prop1 = "kp1"              #default is 0.5
+c_keep_prop2 = "kp2"              #default is 0.5
 
-
+{ 
+  # filter shape + stride          maxpooling filter shape and stride
+  "cv1" : ([5,5,3,32], [1,1,1,1]), "p1" : ([1,2,2,1], [1,2,2,1]),
+  "cv2" : ([5,5,32,43], [1,1,1,1]), "p2" : ([1,2,2,1], [1,2,2,1]),
+  # dimension of the hidden neurons - outputsize
+  "fc1" : 120,
+  "fc2" : 84,
+  "labels" : 43,
+  c_epoch : 15,
+  c_learningrate : 0.001
+}
+```
+The TSC expects to have at least 2 convolutions and three fully connected layers. The client can optionally add an additional covolution layer by specifying filter and stride as for the `cv1` and `cv2`.
+```
+"cv3" : ([2,2,43,43], [1,1,1,1]), "p3" : ([1,2,2,1], [1,1,1,1])
+```
+Optional parameters are the constants defined above like `c_keep_prop1` but also the depth of the fully connecteds. The resulting depths of the fully connnecteds is calculated on basis of the shape output of the convolution 2 or 3 and the expected number of labels ( = 43) we're searching for.
+I've applied a relation according to the LeNet architecture which results in
+```
+fc1 = (size(conv_out) + size(labels)) * 5 / 17
+fc2 = fc1 * 7 / 10
+#example LeNet architecture
+fc1 = (400+10) * 5 / 17 = 120.58
+fc2 = (120.58 * 7 / 10) = 84.40
+```
+Some configuration setup can be found in the solution
 
 ###Data Set Summary & Exploration
+
+The testdata available for us is partitioned into three segments. There is the training set which is used to train the NN. It has - please refere to the `__printSummary` method above - 34799 images of 32x32 pixels and a depth of 3 byte RGB. Each of the pictures represent one of 43 traffic signs as shown in `drawDataSetExample`.
+The validation set contains about 4410 elements and is used to verify the accuracy of the trained network. Last but not least there is the test set with about 12630 samples. The test set is used to verify the trained NN on "new" data.
+
+The first trainings of the NN shows a very low performance - so I decided to dive into the details of the testdata. As a first step I analyzed the distribution of samples for the different labels. As you can see in the figure below, there is a big variation of available samples for different labels. 
+![alt text][image1]
+E.g. label 2 has about 2010 training samples while lable 0 is below 250 samples. As a result, the resulting NN will be very good in classifying label 2 samples, but will often fail in case of labels 0, 19, 37, ...
+
+Furthermore while drawing different samples - I've picked out the label 41 - I realized that many of the images really look the same which would result in less samples.
 
 ####1. Provide a basic summary of the data set. In the code, the analysis should be done using python, numpy and/or pandas methods rather than hardcoding results manually.
 
@@ -150,7 +195,7 @@ signs data set:
 
 Here is an exploratory visualization of the data set. It is a bar chart showing how the data ...
 
-![alt text][image1]
+
 
 ###Design and Test a Model Architecture
 
@@ -190,7 +235,56 @@ My final model consisted of the following layers:
 | Softmax				| etc.        									|
 |						|												|
 |						|												|
- 
+
+
+Please note: If not explicitly mentioned I've used for convolution filters always a stride of (1,1,1,1) while for the max pooling a stride of (1,2,2,1). The arrow in the table `<-` shall indicate the same setup as in the column to the left.
+
+The following table represents trainings using the same input data but applying up to 6 different configurations. The following parameters are used for all of these configurations: 
+* learning rate = 0.001
+* batchsize = 128
+* epoch-times = 15
+
+| Parameter | Cfg1 | Cfg2 | Cfg3 | Cfg4 | Cfg5 | Cfg6 |
+| :--:|:--:| | | | | |
+| Convolution1 | 5x5 3->32, stride(1,1,1,1) | 4x4 3->16| 5x5 3->108 | 5x5 3->43 | 4x4 3->43 | 4x4 3->108 |
+| MaxPooling1 | 2x2 , stride(1,2,2,1) | <- | <- | <- | <- | <- |
+| ShapeOut CV1 | 14x14x32 | 14x14x16 | 14x14x108 | 14x14x43 | 14x14x43 | 14x14x108 |
+| Convolution2 | 5x5 32->43, stride(1,1,1,1) | 5x5 16->43| 5x5 108->108 | 5x5 43->108 | 4x4 43->108 | 4x4 108->43 |
+| MaxPooling2 | 2x2 , stride(1,2,2,1) |<- | <-| <- | <- | <- |
+| ShapeOut CV2 | 5x5x43 | 5x5x43 | 5x5x108 | 5x5x108 | 5x5x108 | 5x5x43 |
+| Convolution3 | - | - | - | - | 3x3 108->43 | 2x2 43->43 |
+| MaxPooling3 | - | - | - | - | 2x2, stride(1,1,1,1) | <- |
+| ShapeOut CV3 | - | - | - | - | 2x2x43 | 3x3x43|
+| FullyConnected1 | 1075->120, dropOut = 0.5 | <- | 2700->120 | 2700->806 | 172->63 | 387->126 |
+| FullyConnected2 | 120->84, dropOut = 0.5 | <- | <- | 806->564 | 63->44 | 126->88|
+| FullyConnected2 | 84->43 | <- | <- | 564->43 | 44->43 | 88->43|
+| Accuracy Training | **0.960** | 0.952 | **0.959** | 0.941 | 0.953 | **0.958** |
+| Accuracy Testing | **0.946** | **0.949** | 0.929 |  0.933 | 0.938 | 0.939 |
+
+
+
+One of the first suggestions when not reaching a good accuracy was to adjust the learning rate. So this table below applies almost the same configuration but changing the learning rate. Again the parameters for the testruns are:
+* learning rate = **0.0005**
+* batchsize = 128
+* epoch-times = 15
+
+| Parameter | Cfg7 (LeNet) | Cfg8 | Cfg9 | Cfg10 | Cfg11 | Cfg12 |
+| :--:|:--:| | | | | |
+| Convolution1 | 5x5 3->6, stride(1,1,1,1) | 4x4 3->16| 5x5 3->108 | 5x5 3->43 | 5x5 3->108 | 4x4 3->108 |
+| MaxPooling1 | 2x2 , stride(1,2,2,1) | <- | <- | <- | <- | <- |
+| ShapeOut CV1 | 14x14x6 | 14x14x16 | 14x14x108 | 14x14x43 | 14x14x108 | 14x14x108 |
+| Convolution2 | 5x5 6->16, stride(1,1,1,1) | 5x5 16->43| 5x5 108->108 | 5x5 43->108 | 5x5 108->43 | 4x4 108->43 |
+| MaxPooling2 | 2x2 , stride(1,2,2,1) |<- | <-| <- | <- | <- |
+| ShapeOut CV2 | 5x5x16 | 5x5x43 | 5x5x108 | 5x5x108 | 5x5x43 | 5x5x43 |
+| Convolution3 | - | - | - | - | -| 2x2 43->43 |
+| MaxPooling3 | - | - | - | - | - | 2x2, stride(1,1,1,1) |
+| ShapeOut CV3 | - | - | - | - | - | 3x3x43|
+| FullyConnected1 | 400->120, dropOut = 0.5 | 1075->120 | 2700->120 | 2700->806 | 1075->328 | 387->126 |
+| FullyConnected2 | 120->84, dropOut = 0.5 | <- | <- | 806->564 | 328->229 | 126->88|
+| FullyConnected2 | 84->43 | <- | <- | 564->43 | 229->43 | 88->43|
+| Accuracy Training | 0.885 | 0.938 | 0.949 | 0.949 | **0.959** | **0.957** |
+| Accuracy Testing | - | 0.924 | 0.938 |  0.930 | 0.936 | 0.937 |
+
 
 
 ####3. Describe how you trained your model. The discussion can include the type of optimizer, the batch size, number of epochs and any hyperparameters such as learning rate.
