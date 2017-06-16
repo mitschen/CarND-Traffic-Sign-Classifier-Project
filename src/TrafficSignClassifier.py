@@ -160,7 +160,7 @@ class TrafficSignClassifier():
             TrafficSignClassifier.y_custom.append(val[1])
         for f in files:
             TrafficSignClassifier.X_custom.append(scipy.misc.imread(f))
-        TrafficSignClassifier.X_custom = np.array(TrafficSignClassifier.X_custom)
+        TrafficSignClassifier.X_custom = np.array(TrafficSignClassifier.X_custom).astype(np.float32)
         TrafficSignClassifier.y_custom = np.array(TrafficSignClassifier.y_custom)
         
     def __printSummary():
@@ -315,7 +315,7 @@ class TrafficSignClassifier():
 #_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 #/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
     
-    def __init__(self, logger = DefaultLoggerClient):
+    def __init__(self, cfg, logger = DefaultLoggerClient):
         #plausibility check - guarantee that we've already imported some data
         assert(not (TrafficSignClassifier.X_train is None))
         self.X_train = np.copy(TrafficSignClassifier.X_train) 
@@ -324,10 +324,19 @@ class TrafficSignClassifier():
         self.y_valid = np.copy(TrafficSignClassifier.y_valid)
         self.X_test = np.copy(TrafficSignClassifier.X_test)
         self.y_test = np.copy(TrafficSignClassifier.y_test)
+        if(not (TrafficSignClassifier.X_custom is None) ):
+            self.X_custom = np.copy(TrafficSignClassifier.X_custom)
+            self.y_custom = np.copy(TrafficSignClassifier.y_custom)
+        else:
+            self.X_custom = None
+            self.y_custom = None
         self.classes = TrafficSignClassifier.classes
         self.id = TrafficSignClassifier.__getId()
         self.logger = logger
         self.logger.log("{0:d} Create Instance".format(self.id))
+        self.cfg = cfg
+        #remember if the tensor was already initialized
+        self.__tensorInit = False
         
         #tensorflow placeholder
         #otherwise we're running into the non initialized variables problem
@@ -335,8 +344,21 @@ class TrafficSignClassifier():
         self.phY = None
         self.logitsCB = None
         self.one_hot_yCB = None
-        self.fc1_kb = None
-        self.fc2_kb = None
+        self.fc1_kp = None
+        self.fc2_kp = None
+        #tensor variables
+        self.fc1_W = None
+        self.fc2_W = None
+        self.fc3_W = None
+        self.fc1_b = None
+        self.fc2_b = None
+        self.fc3_b = None
+        self.conv1_W = None
+        self.conv1_b = None
+        self.conv2_W = None
+        self.conv2_b = None
+        self.conv3_W = None
+        self.conv3_b = None
         
         #some flags used for further processing
         self.flag_isGrayScaled = False
@@ -352,6 +374,9 @@ class TrafficSignClassifier():
         
         self.X_valid -= 128
         self.X_valid /= 128.
+        if not (self.X_custom is None):
+            self.X_custom -= 128
+            self.X_custom /= 128.
         self.flag_isNormalized = True
         
     def convertToGrayScale_luminosity(self):
@@ -394,6 +419,30 @@ class TrafficSignClassifier():
         else:
             plt.imshow(image)
         plt.show() 
+    def __TensorInit(self, cfg):
+        if(True == self.__tensorInit):
+            return False
+        
+        #initialize all tensors
+        
+        #input data is 32x32 x 3 (depth)
+        if(self.flag_isGrayScaled == True):
+            self.phX = tf.placeholder(tf.float32, A(None, self.X_train.shape[1], self.X_train.shape[2], 1))
+        else:
+            self.phX = tf.placeholder(tf.float32, (None, self.X_train.shape[1], self.X_train.shape[2], self.X_train.shape[3]))
+        self.phY = tf.placeholder(tf.int32, (None))
+        #one-hot result out of 43
+        self.one_hot_y = tf.one_hot(self.phY, len(self.classes.keys()))
+        #setup the dropout tensor
+        self.fc1_kp = tf.placeholder(tf.float32)
+        self.fc2_kp = tf.placeholder(tf.float32)
+        #specify the logits tensor
+        self.logits = self.__LeNet(cfg, self.phX)
+        
+        
+        self.__tensorInit = True
+        return True
+        pass
         
     def __LeNet(self,cfg, x):
         #some constants to make the code better readable
@@ -409,18 +458,19 @@ class TrafficSignClassifier():
         if (self.flag_isGrayScaled == True):
             #reduce the input channels to 1
             inputFilter[c_filter_in] = 1
-        conv1_W = tf.Variable(tf.truncated_normal(shape=(inputFilter), mean = mu, stddev = sigma))
-        conv1_b = tf.Variable(tf.zeros(cfg["cv1"][c_filter][c_filter_out]))
-        conv1   = tf.nn.conv2d(x, conv1_W, strides=cfg["cv1"][c_strides], padding='VALID') + conv1_b
+        print (inputFilter)
+        self.conv1_W = tf.Variable(tf.truncated_normal(shape=(inputFilter), mean = mu, stddev = sigma), name='conv1_W')
+        self.conv1_b = tf.Variable(tf.zeros(cfg["cv1"][c_filter][c_filter_out]), name='conv1_b')
+        conv1   = tf.nn.conv2d(x, self.conv1_W, strides=cfg["cv1"][c_strides], padding='VALID') + self.conv1_b
         #activation - always using relu
         conv1 = tf.nn.relu(conv1)
         #pooling
         conv1 = tf.nn.max_pool(conv1, ksize=cfg["p1"][c_filter], strides=cfg["p1"][c_strides], padding='VALID')
         
         #convolutional layer 2
-        conv2_W = tf.Variable(tf.truncated_normal(shape=(cfg["cv2"][c_filter]), mean = mu, stddev = sigma))
-        conv2_b = tf.Variable(tf.zeros(cfg["cv2"][c_filter][c_filter_out]))
-        conv2   = tf.nn.conv2d(conv1, conv2_W, strides=cfg["cv2"][c_strides], padding='VALID') + conv2_b
+        self.conv2_W = tf.Variable(tf.truncated_normal(shape=(cfg["cv2"][c_filter]), mean = mu, stddev = sigma), name='conv2_W')
+        self.conv2_b = tf.Variable(tf.zeros(cfg["cv2"][c_filter][c_filter_out]), name='conv2_b')
+        conv2   = tf.nn.conv2d(conv1, self.conv2_W, strides=cfg["cv2"][c_strides], padding='VALID') + self.conv2_b
         conv2 = tf.nn.relu(conv2)
         conv2 = tf.nn.max_pool(conv2, ksize=cfg["p2"][c_filter], strides=cfg["p2"][c_strides], padding='VALID')
         
@@ -436,9 +486,9 @@ class TrafficSignClassifier():
             cv3_filter = cfg["cv3"]
             cv3_pool = cfg["p3"]
             
-        conv3_W = tf.Variable(tf.truncated_normal(shape=(cv3_filter[c_filter]), mean = mu, stddev = sigma))
-        conv3_b = tf.Variable(tf.zeros(cv3_filter[c_filter][c_filter_out]))
-        conv3   = tf.nn.conv2d(conv2, conv3_W, strides=cv3_filter[c_strides], padding='VALID') + conv3_b
+        self.conv3_W = tf.Variable(tf.truncated_normal(shape=(cv3_filter[c_filter]), mean = mu, stddev = sigma), name='conv3_W')
+        self.conv3_b = tf.Variable(tf.zeros(cv3_filter[c_filter][c_filter_out]), name='conv3_b')
+        conv3   = tf.nn.conv2d(conv2, self.conv3_W, strides=cv3_filter[c_strides], padding='VALID') + self.conv3_b
         conv3 = tf.nn.relu(conv3)
         conv3 = tf.nn.max_pool(conv3, ksize=cv3_pool[c_filter], strides=cv3_pool[c_strides], padding='VALID')
         
@@ -460,27 +510,25 @@ class TrafficSignClassifier():
             cfg["fc2"] = int(cfg["fc1"]*7 / 10);
         
         #Layer 3: Fully Connected
-        self.fc1_kp = tf.placeholder(tf.float32)
-        fc1_W = tf.Variable(tf.truncated_normal(shape=(noOut, cfg["fc1"]), mean = mu, stddev = sigma))
-        fc1_b = tf.Variable(tf.zeros(cfg["fc1"]))
-        fc1   = tf.matmul(fc0, fc1_W) + fc1_b
+        self.fc1_W = tf.Variable(tf.truncated_normal(shape=(noOut, cfg["fc1"]), mean = mu, stddev = sigma), name='fc1_W')
+        self.fc1_b = tf.Variable(tf.zeros(cfg["fc1"]), name='fc1_b')
+        fc1   = tf.matmul(fc0, self.fc1_W) + self.fc1_b
         
         #activation.
         fc1    = tf.nn.relu(fc1)
         fc1    = tf.nn.dropout(fc1, self.fc1_kp)
         
         #Layer 4: Fully Connected
-        self.fc2_kp = tf.placeholder(tf.float32)
-        fc2_W  = tf.Variable(tf.truncated_normal(shape=(cfg["fc1"], cfg["fc2"]), mean = mu, stddev = sigma))
-        fc2_b  = tf.Variable(tf.zeros(cfg["fc2"]))
-        fc2    = tf.matmul(fc1, fc2_W) + fc2_b
+        self.fc2_W  = tf.Variable(tf.truncated_normal(shape=(cfg["fc1"], cfg["fc2"]), mean = mu, stddev = sigma), name='fc2_W')
+        self.fc2_b  = tf.Variable(tf.zeros(cfg["fc2"]), name='fc2_b')
+        fc2    = tf.matmul(fc1, self.fc2_W) + self.fc2_b
         fc2    = tf.nn.relu(fc2)
         fc2    = tf.nn.dropout(fc2, self.fc2_kp)
         
         # SOLUTION: Layer 5: Fully Connected.
-        fc3_W  = tf.Variable(tf.truncated_normal(shape=(cfg["fc2"], cfg["labels"]), mean = mu, stddev = sigma))
-        fc3_b  = tf.Variable(tf.zeros(cfg["labels"]))
-        logits = tf.matmul(fc2, fc3_W) + fc3_b
+        self.fc3_W  = tf.Variable(tf.truncated_normal(shape=(cfg["fc2"], cfg["labels"]), mean = mu, stddev = sigma), name='fc3_W')
+        self.fc3_b  = tf.Variable(tf.zeros(cfg["labels"]), name='fc3_b')
+        logits = tf.matmul(fc2, self.fc3_W) + self.fc3_b
         
         #write some details about testrun
         self.logger.log(" CV1 "+str(cfg["cv1"])+"MaxP "+str(cfg["p1"]))
@@ -497,16 +545,18 @@ class TrafficSignClassifier():
         return logits    
     
         
-    def TrainCNN(self, cfg, storeNet = False):
-        #input data is 32x32 x 3 (depth)
-        if(self.flag_isGrayScaled == True):
-            self.phX = tf.placeholder(tf.float32, (None, self.X_train.shape[1], self.X_train.shape[2], 1))
-        else:
-            self.phX = tf.placeholder(tf.float32, (None, self.X_train.shape[1], self.X_train.shape[2], self.X_train.shape[3]))
-        self.phY = tf.placeholder(tf.int32, (None))
-        #one-hot result out of 43
-        self.one_hot_y = tf.one_hot(self.phY, len(self.classes.keys()))
-
+    def TrainCNN(self, storeNet = False):
+        cfg = self.cfg
+        #initialize the tensor if not already the case
+        self.__TensorInit(cfg)
+#         #input data is 32x32 x 3 (depth)
+#         if(self.flag_isGrayScaled == True):
+#             self.phX = tf.placeholder(tf.float32, (None, self.X_train.shape[1], self.X_train.shape[2], 1))
+#         else:
+#             self.phX = tf.placeholder(tf.float32, (None, self.X_train.shape[1], self.X_train.shape[2], self.X_train.shape[3]))
+#         self.phY = tf.placeholder(tf.int32, (None))
+#         #one-hot result out of 43
+#         self.one_hot_y = tf.one_hot(self.phY, len(self.classes.keys()))
         #readout configuration
         #learning rate
         
@@ -521,7 +571,7 @@ class TrafficSignClassifier():
         self.logger.log("LearnRate {0:f}\nEpochCnt {1:d}\BatchSize {2:d}\n".format(rate, EPOCHS, BATCH_SIZE))
         self.logger.log("Keep Prop FC1 "+str(keep_prop1)+" Keep Prop FC2 "+str(keep_prop2))
         
-        self.logits = self.__LeNet(cfg, self.phX)
+#         self.logits = self.__LeNet(cfg, self.phX)
         cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=self.one_hot_y, logits=self.logits)
         loss_operation = tf.reduce_mean(cross_entropy)
         optimizer = tf.train.AdamOptimizer(learning_rate = rate)
@@ -571,16 +621,30 @@ class TrafficSignClassifier():
             total_accuracy += (accuracy * len(batch_x))
         return total_accuracy / num_examples        
         
-    def analyzeCustomData(self, X_data, y_data):
+        
+    def analyzeCustomData(self, _type='custom'):
+        X = None
+        Y = None
+        if _type == 'train':
+            X = self.X_test
+            Y = self.y_test
+        elif _type == 'valid':
+            X = self.X_valid
+            Y = self.y_valid
+        elif _type == 'text':
+            X = self.X_train
+            Y = self.y_train
+        else:
+            X = self.X_custom
+            Y = self.y_custom
+            
         with tf.Session() as sess:
+            self.__TensorInit(self.cfg)
             fileToRestore = './tsc_cfg_'+str(self.id)
-            print (fileToRestore)
-            new_saver = tf.train.import_meta_graph(fileToRestore+'.meta')
-            #tf.train.Saver().restore(sess, fileToRestore)
-            new_saver.restore(sess, tf.train.latest_checkpoint('./'))
-            #tf.train.Saver().restore(tf.train.latest_checkpoint('.'))
-            test_accuracy = self.__EvaluateCNN(X_data, y_data)
-            print ("Test Accuracy = {:.3f}".format(test_accuracy))
+            tf.train.Saver().restore(sess, fileToRestore)
+            self.logger.log("Restore session in {}".format(fileToRestore))
+            test_accuracy = self.__EvaluateCNN(X, Y)
+            print ("analyzeCustomData ({0}) = {1:.3f}".format(_type, test_accuracy))
 
 
 
@@ -740,13 +804,13 @@ if __name__ == '__main__':
     #TrafficSignClassifier.drawDataSetExample()
     #TrafficSignClassifier.dataAugmentation(1000)
     
-    TrafficSignClassifier.dataAugmentation(100)
+    TrafficSignClassifier.dataAugmentation(10)
     log = Logger("../results.txt", True)
     finalCfg = lenet_configuration[0]
-    tsc = TrafficSignClassifier(log.getLogger(1));
+    tsc = TrafficSignClassifier(finalCfg, log.getLogger(1));
     tsc.normalize_zeroMeanData()
-    tsc.TrainCNN(finalCfg, True)
-    tsc.analyzeCustomData(TrafficSignClassifier.X_custom, TrafficSignClassifier.y_custom)
+    tsc.TrainCNN(True)
+    tsc.analyzeCustomData()
     log.dump()
     print ("Time elapsed ", math.ceil((time.clock() - start)/60) )
     exit(0)
