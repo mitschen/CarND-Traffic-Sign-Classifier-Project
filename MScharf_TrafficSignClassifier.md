@@ -21,11 +21,11 @@ The goals / steps of this project are the following:
 [image1]: ./examples/testsample_distribution.jpeg "Visualization"
 [image2]: ./examples/labels.jpeg "Example of the roadsigns"
 [image3]: ./examples/random_noise.jpg "Random Noise"
-[image4]: ./examples/placeholder.png "Traffic Sign 1"
-[image5]: ./examples/placeholder.png "Traffic Sign 2"
-[image6]: ./examples/placeholder.png "Traffic Sign 3"
-[image7]: ./examples/placeholder.png "Traffic Sign 4"
-[image8]: ./examples/placeholder.png "Traffic Sign 5"
+[image4]: ./examples/13_yield.bmp "Traffic Sign 1"
+[image5]: ./examples/14_stop.bmp "Traffic Sign 2"
+[image6]: ./examples/15_noEntry.bmp "Traffic Sign 3"
+[image7]: ./examples/17_oneway.bmp "Traffic Sign 4"
+[image8]: ./examples/33_turnRight.bmp "Traffic Sign 5"
 
 ## Rubric Points
 ###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/481/view) individually and describe how I addressed each point in my implementation.  
@@ -55,11 +55,12 @@ Searches in the `filepath` for the files test.p/train.p/vlaid.p and signames.csv
 This method will import my custom data I've taken from my surrounding. The fileList is a list of sets containing (filename, labelNbr)- expecting *.bmp files. These informations will be stored in the static members `X_custom`and `y_custom`.
 ######__printSummary():
 Provides a textual output based on the classmemebrs as expected by the jupyter notebook template in form of
-> Basic Summary of the DataSet
-> 	Number of training examples =  34799
-> 	Number of testing examples =  12630
-> 	Image data shape =  (32, 32)
-> 	Number of classes =  43
+>Basic Summary of the DataSet
+>	Number of training examples =  34799
+>	Number of validation examples =  4410
+>	Number of testing examples =  12630
+>	Image data shape =  (32, 32)
+>	Number of classes =  43
 
 Please note - this member is intented to be private and will be get called automatically e.g. in `importData`
 
@@ -179,6 +180,30 @@ The first trainings of the NN shows a very low performance - so I decided to div
 E.g. label 2 has about 2010 training samples while lable 0 is below 250 samples. As a result, the resulting NN will be very good in classifying label 2 samples, but will often fail in case of labels 0, 19, 37, ...
 
 Furthermore while drawing different samples - I've picked out the label 41 - I realized that many of the images really look the same which would result in less samples.
+
+###Data preprocessing and augmentation
+During the first testsetups I've worked with more or less the LeNet configuration to make some basic experiments. As the first step I've therefore concentrated on the training data and did not really play around that much with the tuning parameters of the NN itself. I'll go into more details about the NN architecture below - but now first of all concentrate on the data preprocessing.
+
+To take care of the distribution of data samples and the similarity of samples, i've tried two approaches. First of all I concentrate on a even training of the NN overall labels. Therefore I started with a straight forward approach see `simpleDataAugmentation` method. The goal was to adjust the number of samples for each label to the max number of samples i've found - in other words - all labels should be trained with 2010 samples. Therefore I've created an index of all samples for all labels and appended randomly choosen samples of the corresponding label to the training set.
+The result of this simply augmentation was moderate - training time and memory consumption increases, but the accuracy wasn't really much better.
+
+So as a next step I've thought about how to add additional / new samples to the testset. The result is the `dataAugmentation` function. Similar to the `simpleDataAugmentation` it adds samples to the given set of samples. But instead of using the original samples, I've decided to let's say bring some noise in the testdata. This noise is realized by chose 3 samples randomly from the list of samples for a certain label:
+* use the first sample as it is
+* rotate the second sample for 15°
+* shift the third sample for 2 px on each axis
+
+At the end I've started my training with a sampleset of 1000 elements for each label. The training result was much better.
+
+For sure - i've only applied two different operations to the sampleset. In order to increase the "noise" you could shifting/ rotating in negative direction or by more/ less degree/ px. I didn't spend more time on that, but I'm sure the robustness of the NN could be improved by providing more variance in the sampleset.
+
+In addition to the augmentation, I spend some time in playing around with the samples itself. As we've learnt in out term, normalization of the inflow data is always a good start ;-). So I've implemented the `normalize_zeroMeanData` method. This method simply moves the average of each pixel to 0 and reduces the variance to 1. The consequence was meaningful and results in a better performance.
+As the next step I've tried to play around with the colors - see `convertToGrayScale_luminosity` but the impact was disappointing so that is stopped further investigations.
+
+So in short:
+* augmentation
+* normalization
+
+improved my NN.
 
 ####1. Provide a basic summary of the data set. In the code, the analysis should be done using python, numpy and/or pandas methods rather than hardcoding results manually.
 

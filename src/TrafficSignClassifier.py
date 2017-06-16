@@ -337,6 +337,7 @@ class TrafficSignClassifier():
         self.cfg = cfg
         #remember if the tensor was already initialized
         self.__tensorInit = False
+        self.__markdown_tableContent = ""
         
         #tensorflow placeholder
         #otherwise we're running into the non initialized variables problem
@@ -427,7 +428,7 @@ class TrafficSignClassifier():
         
         #input data is 32x32 x 3 (depth)
         if(self.flag_isGrayScaled == True):
-            self.phX = tf.placeholder(tf.float32, A(None, self.X_train.shape[1], self.X_train.shape[2], 1))
+            self.phX = tf.placeholder(tf.float32, (None, self.X_train.shape[1], self.X_train.shape[2], 1))
         else:
             self.phX = tf.placeholder(tf.float32, (None, self.X_train.shape[1], self.X_train.shape[2], self.X_train.shape[3]))
         self.phY = tf.placeholder(tf.int32, (None))
@@ -542,36 +543,45 @@ class TrafficSignClassifier():
         self.logger.log(" FC2 "+str(cfg["fc2"]))
         self.logger.log(" FC3 "+str(cfg["labels"]))
         
+        #print configuration in markdown table format
+        tableCnt =  "Conv1 : "+str(cfg["cv1"][0][0]) +"x"+str(cfg["cv1"][0][1])+" "+str(cfg["cv1"][0][2])+"->"+str(cfg["cv1"][0][3])+"|\n"
+        tableCnt += "MPool1: "+str(cfg["p1"][0][1])+"x"+str(cfg["p1"][0][2])+"|\n"
+        tableCnt += "Shape1: "+str(conv1.get_shape()[1]) +"x"+str(conv1.get_shape()[2])+"x"+str(conv1.get_shape()[3])+"|\n"
+        tableCnt += "Conv2 : "+str(cfg["cv2"][0][0]) +"x"+str(cfg["cv2"][0][1])+" "+str(cfg["cv2"][0][2])+"->"+str(cfg["cv2"][0][3])+"|\n"
+        tableCnt += "MPool2: "+str(cfg["p2"][0][1])+"x"+str(cfg["p2"][0][2])+"|\n"
+        tableCnt += "Shape2: "+str(conv2.get_shape()[1]) +"x"+str(conv2.get_shape()[2])+"x"+str(conv2.get_shape()[3])+"|\n"
+        if(CV3_avail == True):
+            tableCnt += "Conv3 : "+str(cfg["cv3"][0][0]) +"x"+str(cfg["cv3"][0][1])+" "+str(cfg["cv3"][0][2])+"->"+str(cfg["cv3"][0][3])+"|\n"
+            tableCnt += "MPool3: "+str(cfg["p3"][0][1])+" "+str(cfg["p3"][0][2])+"|\n"
+            tableCnt += "Shape3: "+str(conv3.get_shape()[1]) +"x"+str(conv3.get_shape()[2])+"x"+str(conv3.get_shape()[3])+"|\n"
+            tableCnt += "FC1   : "+str(conv3.get_shape()[1]*conv3.get_shape()[2]*conv3.get_shape()[3])+"->"+str(cfg["fc1"])+", dropOut = "+str(cfg[c_keep_prop1])+"\n"
+        else:
+            tableCnt += "Conv3 : -|\nMPool3: -|\nShape3: -|\n"
+            tableCnt += "FC1   : "+str(conv2.get_shape()[1]*conv2.get_shape()[2]*conv2.get_shape()[3])+"->"+str(cfg["fc1"])+", dropOut = "+str(cfg[c_keep_prop1])+"\n"
+        tableCnt += "FC2   : "+str(cfg["fc1"])+"->"+str(cfg["fc2"])+", dropOut = "+str(cfg[c_keep_prop2])+"\n"
+        tableCnt += "FC3   : "+str(cfg["fc2"])+"->"+str(cfg["labels"])+"\n"
+        self.__markdown_tableContent +=tableCnt
         return logits    
     
         
     def TrainCNN(self, storeNet = False):
         cfg = self.cfg
-        #initialize the tensor if not already the case
-        self.__TensorInit(cfg)
-#         #input data is 32x32 x 3 (depth)
-#         if(self.flag_isGrayScaled == True):
-#             self.phX = tf.placeholder(tf.float32, (None, self.X_train.shape[1], self.X_train.shape[2], 1))
-#         else:
-#             self.phX = tf.placeholder(tf.float32, (None, self.X_train.shape[1], self.X_train.shape[2], self.X_train.shape[3]))
-#         self.phY = tf.placeholder(tf.int32, (None))
-#         #one-hot result out of 43
-#         self.one_hot_y = tf.one_hot(self.phY, len(self.classes.keys()))
-        #readout configuration
-        #learning rate
         
         rate = 0.001 if c_learningrate not in cfg.keys() else cfg[c_learningrate]
         EPOCHS = 10 if c_epoch not in cfg.keys() else cfg[c_epoch]
         BATCH_SIZE = 128 if c_batchsize not in cfg.keys() else cfg[c_batchsize]
         keep_prop1 = 0.5 if c_keep_prop1 not in cfg.keys() else cfg[c_keep_prop1]
         keep_prop2 = 0.5 if c_keep_prop2 not in cfg.keys() else cfg[c_keep_prop2]
+        cfg[c_keep_prop1] = keep_prop1
+        cfg[c_keep_prop2] = keep_prop2
 
+        #initialize the tensor if not already the case
+        self.__TensorInit(cfg)
 
         #write some informations about the testrun
         self.logger.log("LearnRate {0:f}\nEpochCnt {1:d}\BatchSize {2:d}\n".format(rate, EPOCHS, BATCH_SIZE))
         self.logger.log("Keep Prop FC1 "+str(keep_prop1)+" Keep Prop FC2 "+str(keep_prop2))
         
-#         self.logits = self.__LeNet(cfg, self.phX)
         cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=self.one_hot_y, logits=self.logits)
         loss_operation = tf.reduce_mean(cross_entropy)
         optimizer = tf.train.AdamOptimizer(learning_rate = rate)
@@ -595,14 +605,17 @@ class TrafficSignClassifier():
                 self.logger.log("EPOCH {} ...".format(i+1))
                 self.logger.log("Instance {0:d}: Validation Accuracy = {1:.3f}".format(self.id, validation_accuracy))
                 self.logger.log()
+            self.__markdown_tableContent+="Validating {:.3f}".format(validation_accuracy)
             if (validation_accuracy > 0.93):
                 #let's have a try on the testset
                 testset_accuracy = self.__EvaluateCNN( self.X_test, self.y_test)
                 self.logger.log("Instance {0:d}: On testdata we're achieving accuracy = {1:.3f}".format(self.id, testset_accuracy))
+                self.__markdown_tableContent+="Testing {:.3f}".format(validation_accuracy)
             
             if(storeNet == True):
                 tf.train.Saver().save(sess, './tsc_cfg_'+str(self.id))
                 self.logger.log("Saved session in ./tsc_cfg_"+str(self.id))
+        self.logger.log(self.__markdown_tableContent);
             
 
     def __EvaluateCNN(self, X_data, y_data):
@@ -619,7 +632,8 @@ class TrafficSignClassifier():
             batch_x, batch_y = X_data[offset:offset+BATCH_SIZE], y_data[offset:offset+BATCH_SIZE]
             accuracy = sess.run(accuracy_operation, feed_dict={self.phX: batch_x, self.phY: batch_y, self.fc1_kp : 1.0, self.fc2_kp : 1.0})
             total_accuracy += (accuracy * len(batch_x))
-        return total_accuracy / num_examples        
+        return total_accuracy / num_examples
+    
         
         
     def analyzeCustomData(self, _type='custom'):
@@ -631,10 +645,11 @@ class TrafficSignClassifier():
         elif _type == 'valid':
             X = self.X_valid
             Y = self.y_valid
-        elif _type == 'text':
+        elif _type == 'test':
             X = self.X_train
             Y = self.y_train
         else:
+            _type = 'custom'
             X = self.X_custom
             Y = self.y_custom
             
@@ -644,7 +659,15 @@ class TrafficSignClassifier():
             tf.train.Saver().restore(sess, fileToRestore)
             self.logger.log("Restore session in {}".format(fileToRestore))
             test_accuracy = self.__EvaluateCNN(X, Y)
-            print ("analyzeCustomData ({0}) = {1:.3f}".format(_type, test_accuracy))
+            self.logger.log("analyzeCustomData ({0}) = {1:.3f}".format(_type, test_accuracy))
+            if _type=='custom':
+                self.logger.log("Top K evaluation")
+                propability = tf.nn.softmax(logits=self.logits)
+                bestMatch = tf.nn.top_k(propability,5)
+                val = sess.run(bestMatch, feed_dict={self.phX: X, self.phY: Y, self.fc1_kp : 1.0, self.fc2_kp : 1.0})
+                for prop, match, label in zip(val[0], val[1], Y):
+                    self.logger.log("Label {} identified as {}, {} with propability of ({:.2f},{:.2f})".format(label, match[0], match[1], prop[0], prop[1]))
+                    
 
 
 
@@ -681,7 +704,7 @@ if __name__ == '__main__':
                               "fc2" : 84,
                               "labels" : 43,
                               c_epoch : 15,
-                              c_learningrate : 0.001
+                              c_learningrate : 0.0005
                             },
                             {  
                               # filter shape + stride          maxpooling filter shape and stride
@@ -804,7 +827,7 @@ if __name__ == '__main__':
     #TrafficSignClassifier.drawDataSetExample()
     #TrafficSignClassifier.dataAugmentation(1000)
     
-    TrafficSignClassifier.dataAugmentation(10)
+    TrafficSignClassifier.dataAugmentation(1500)
     log = Logger("../results.txt", True)
     finalCfg = lenet_configuration[0]
     tsc = TrafficSignClassifier(finalCfg, log.getLogger(1));
