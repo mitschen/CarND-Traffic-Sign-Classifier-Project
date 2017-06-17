@@ -1,0 +1,27 @@
+@startuml
+class TrafficSignClassifier{
+-{static}__getId()
++{static}importData(filepath)
++{static}importCustomImages(filepath, fileList)
+-{static}__printSummary(header)
++{static}preAnalyzeData()
+-{static}__preAnalyzeData(force = False)
++{static}simpleDataAugmentation()
++{static}dataAugmentation(size = None)
+-{static}__drawDataSet(samples, labels)
++{static}drawCustomDataSet()
++{static}drawDataSetExample()
+--
+-__init__(self, cfg, logger = DefaultLoggerClient())
++reloadData()
++normalize_zeroMeanData(self)
++convertToGrayScale_luminosity(self)
++drawImage(self)
+-__TensorInit(self, cfg)
+-__LeNet(self,cfg, x)
++TrainCNN(self, storeNet = False)
+-__EvaluateCNN(self, X_data, y_data)
++analyzeCustomData(self, _type='custom')
+}
+
+@enduml

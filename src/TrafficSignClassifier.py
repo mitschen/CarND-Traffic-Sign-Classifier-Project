@@ -163,9 +163,9 @@ class TrafficSignClassifier():
         TrafficSignClassifier.X_custom = np.array(TrafficSignClassifier.X_custom).astype(np.float32)
         TrafficSignClassifier.y_custom = np.array(TrafficSignClassifier.y_custom)
         
-    def __printSummary():
+    def __printSummary(header = "Basic Summary of the DataSet"):
         #print a summary according to Jupyter Notebook requirements
-        print("Basic Summary of the DataSet")
+        print(header)
         print("\tNumber of training examples = ", TrafficSignClassifier.X_train.shape[0])
         print("\tNumber of validation examples = ", TrafficSignClassifier.X_valid.shape[0])
         print("\tNumber of testing examples = ", TrafficSignClassifier.X_test.shape[0])
@@ -267,7 +267,33 @@ class TrafficSignClassifier():
         TrafficSignClassifier.X_train = np.array(X_newTrain)
         TrafficSignClassifier.y_train = y_newLabel
         TrafficSignClassifier.__preAnalyzeData(True)
-        TrafficSignClassifier.__printSummary()
+        TrafficSignClassifier.__printSummary("Summary of DataSet after applying Augmentation")
+        
+    def __drawDataSet(samples, labels):
+        #make a matplot output of samples/lables
+        dim1 = math.ceil(len(labels) / 10.)
+        dim2 = 10
+        
+        figure = plt.figure()
+        index = 1
+        for label, sample in zip(labels, samples):
+            sample = sample.astype(np.uint8)
+            image = sample.squeeze()
+            a = figure.add_subplot(dim1,dim2, index)
+            a.set_title(str(label[0]))
+            a.axis('off')
+            index+=1
+            plt.imshow(image)
+        plt.subplots_adjust(hspace = 0.5)            
+        plt.show()
+    
+    def drawCustomDataSet():
+        if( not(TrafficSignClassifier.X_custom is None)):
+            samples = TrafficSignClassifier.X_custom
+            labels = list(map(lambda x : (x, TrafficSignClassifier.classes[str(x)][0]), TrafficSignClassifier.y_custom))
+            TrafficSignClassifier.__drawDataSet(samples, labels)
+            return
+        print("No custom data given")
         
     def drawDataSetExample():
         #pick out one sample from the set of given labels and
@@ -284,22 +310,7 @@ class TrafficSignClassifier():
             labels.append((key, TrafficSignClassifier.classes[str(key)][0]) )
         assert(len(labels) == len(samples))
         
-        dim1 = math.ceil(len(labels) / 10.)
-        dim2 = 10
-        
-        figure = plt.figure()
-        index = 1
-        for label, sample in zip(labels, samples):
-            sample = sample.astype(np.uint8)
-            image = sample.squeeze()
-            a = figure.add_subplot(dim1,dim2, index)
-            a.set_title(str(label[0]))
-            a.axis('off')
-            index+=1
-            plt.imshow(image)
-        plt.subplots_adjust(hspace = 0.5)            
-        plt.show()
-        
+        TrafficSignClassifier.__drawDataSet(samples, labels)
         
     __getId = staticmethod(__getId)
     importData = staticmethod(importData)
@@ -310,27 +321,29 @@ class TrafficSignClassifier():
     __printSummary = staticmethod(__printSummary)
     drawDataSetExample = staticmethod(drawDataSetExample)
     importCustomImages = staticmethod(importCustomImages) 
+    drawCustomDataSet = staticmethod(drawCustomDataSet)
+    __drawDataSet = staticmethod(__drawDataSet)
 
 #/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 #_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 #/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
     
-    def __init__(self, cfg, logger = DefaultLoggerClient):
+    def __init__(self, cfg, logger = DefaultLoggerClient()):
         #plausibility check - guarantee that we've already imported some data
-        assert(not (TrafficSignClassifier.X_train is None))
-        self.X_train = np.copy(TrafficSignClassifier.X_train) 
-        self.y_train = np.copy(TrafficSignClassifier.y_train)
-        self.X_valid = np.copy(TrafficSignClassifier.X_valid)
-        self.y_valid = np.copy(TrafficSignClassifier.y_valid)
-        self.X_test = np.copy(TrafficSignClassifier.X_test)
-        self.y_test = np.copy(TrafficSignClassifier.y_test)
-        if(not (TrafficSignClassifier.X_custom is None) ):
-            self.X_custom = np.copy(TrafficSignClassifier.X_custom)
-            self.y_custom = np.copy(TrafficSignClassifier.y_custom)
-        else:
-            self.X_custom = None
-            self.y_custom = None
-        self.classes = TrafficSignClassifier.classes
+        self.X_train = None 
+        self.y_train = None
+        self.X_valid = None
+        self.y_valid = None
+        self.X_test = None
+        self.y_test = None
+        self.X_custom = None
+        self.y_custom = None
+        self.classes = None
+        #some flags used for further processing
+        self.flag_isGrayScaled = False
+        self.flag_isNormalized = False
+        self.flag_isCustomNormalized = False
+        self.reloadData()
         self.id = TrafficSignClassifier.__getId()
         self.logger = logger
         self.logger.log("{0:d} Create Instance".format(self.id))
@@ -361,23 +374,42 @@ class TrafficSignClassifier():
         self.conv3_W = None
         self.conv3_b = None
         
-        #some flags used for further processing
+        
+    def reloadData(self):
+        #in case that user adds custom data after instantiating the 
+        assert(not (TrafficSignClassifier.X_train is None))
+        self.X_train = np.copy(TrafficSignClassifier.X_train) 
+        self.y_train = np.copy(TrafficSignClassifier.y_train)
+        self.X_valid = np.copy(TrafficSignClassifier.X_valid)
+        self.y_valid = np.copy(TrafficSignClassifier.y_valid)
+        self.X_test = np.copy(TrafficSignClassifier.X_test)
+        self.y_test = np.copy(TrafficSignClassifier.y_test)
+        if(not (TrafficSignClassifier.X_custom is None) ):
+            self.X_custom = np.copy(TrafficSignClassifier.X_custom)
+            self.y_custom = np.copy(TrafficSignClassifier.y_custom)
+        else:
+            self.X_custom = None
+            self.y_custom = None
+        self.classes = TrafficSignClassifier.classes
         self.flag_isGrayScaled = False
         self.flag_isNormalized = False
+        self.flag_isCustomNormalized = False
     
     def normalize_zeroMeanData(self):
         #adjust the samples so that they have a zero mean
-        self.X_test -= 128
-        self.X_test /= 128.
-        
-        self.X_train -= 128
-        self.X_train /= 128.
-        
-        self.X_valid -= 128
-        self.X_valid /= 128.
-        if not (self.X_custom is None):
+        if(False == self.flag_isNormalized):
+            self.X_test -= 128
+            self.X_test /= 128.
+            
+            self.X_train -= 128
+            self.X_train /= 128.
+            
+            self.X_valid -= 128
+            self.X_valid /= 128.
+        if not (self.X_custom is None) and (False == self.flag_isCustomNormalized):
             self.X_custom -= 128
             self.X_custom /= 128.
+            self.flag_isCustomNormalized = True
         self.flag_isNormalized = True
         
     def convertToGrayScale_luminosity(self):
@@ -459,7 +491,6 @@ class TrafficSignClassifier():
         if (self.flag_isGrayScaled == True):
             #reduce the input channels to 1
             inputFilter[c_filter_in] = 1
-        print (inputFilter)
         self.conv1_W = tf.Variable(tf.truncated_normal(shape=(inputFilter), mean = mu, stddev = sigma), name='conv1_W')
         self.conv1_b = tf.Variable(tf.zeros(cfg["cv1"][c_filter][c_filter_out]), name='conv1_b')
         conv1   = tf.nn.conv2d(x, self.conv1_W, strides=cfg["cv1"][c_strides], padding='VALID') + self.conv1_b
@@ -475,10 +506,8 @@ class TrafficSignClassifier():
         conv2 = tf.nn.relu(conv2)
         conv2 = tf.nn.max_pool(conv2, ksize=cfg["p2"][c_filter], strides=cfg["p2"][c_strides], padding='VALID')
         
-        print (conv2.get_shape())
         #convolutional layer 3
         cv3_filter = ([5,5,int(conv2.get_shape()[3]),1], [1,1,1,1])
-        print (cv3_filter)
         cv3_pool = ([1,1,1,1], [1,1,1,1] )
         CV3_avail = False
         if "cv3" in cfg.keys():
@@ -531,20 +560,8 @@ class TrafficSignClassifier():
         self.fc3_b  = tf.Variable(tf.zeros(cfg["labels"]), name='fc3_b')
         logits = tf.matmul(fc2, self.fc3_W) + self.fc3_b
         
-        #write some details about testrun
-        self.logger.log(" CV1 "+str(cfg["cv1"])+"MaxP "+str(cfg["p1"]))
-        self.logger.log(" CV1 - Shape "+str(conv1.get_shape()))
-        self.logger.log(" CV2 "+str(cfg["cv2"])+"MaxP "+str(cfg["p2"]))
-        self.logger.log(" CV2 - Shape "+str(conv2.get_shape()))
-        if(CV3_avail == True):
-            self.logger.log(" CV3 "+str(cfg["cv3"])+"MaxP "+str(cfg["p3"]))
-            self.logger.log(" CV3 - Shape "+str(conv3.get_shape()))
-        self.logger.log(" FC1 "+str(cfg["fc1"]))
-        self.logger.log(" FC2 "+str(cfg["fc2"]))
-        self.logger.log(" FC3 "+str(cfg["labels"]))
-        
         #print configuration in markdown table format
-        tableCnt =  "Conv1 : "+str(cfg["cv1"][0][0]) +"x"+str(cfg["cv1"][0][1])+" "+str(cfg["cv1"][0][2])+"->"+str(cfg["cv1"][0][3])+"|\n"
+        tableCnt =  "\n\nConv1 : "+str(cfg["cv1"][0][0]) +"x"+str(cfg["cv1"][0][1])+" "+str(cfg["cv1"][0][2])+"->"+str(cfg["cv1"][0][3])+"|\n"
         tableCnt += "MPool1: "+str(cfg["p1"][0][1])+"x"+str(cfg["p1"][0][2])+"|\n"
         tableCnt += "Shape1: "+str(conv1.get_shape()[1]) +"x"+str(conv1.get_shape()[2])+"x"+str(conv1.get_shape()[3])+"|\n"
         tableCnt += "Conv2 : "+str(cfg["cv2"][0][0]) +"x"+str(cfg["cv2"][0][1])+" "+str(cfg["cv2"][0][2])+"->"+str(cfg["cv2"][0][3])+"|\n"
@@ -579,8 +596,8 @@ class TrafficSignClassifier():
         self.__TensorInit(cfg)
 
         #write some informations about the testrun
-        self.logger.log("LearnRate {0:f}\nEpochCnt {1:d}\BatchSize {2:d}\n".format(rate, EPOCHS, BATCH_SIZE))
-        self.logger.log("Keep Prop FC1 "+str(keep_prop1)+" Keep Prop FC2 "+str(keep_prop2))
+        self.__markdown_tableContent += "LearnRate {0:f}\nEpochCnt {1:d}\nBatchSize {2:d}".format(rate, EPOCHS, BATCH_SIZE)
+        self.__markdown_tableContent += "\nKeep Prop FC1 "+str(keep_prop1)+"\nKeep Prop FC2 "+str(keep_prop2)+"\n\n"
         
         cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=self.one_hot_y, logits=self.logits)
         loss_operation = tf.reduce_mean(cross_entropy)
@@ -622,7 +639,6 @@ class TrafficSignClassifier():
         BATCH_SIZE = 128# if c_batchsize not in cfg.keys() else cfg[c_batchsize]
         correct_prediction = tf.equal(tf.argmax(self.logits, 1), tf.argmax(self.one_hot_y, 1))
         accuracy_operation = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-        #saver = tf.train.Saver()
         
         num_examples = len(X_data)
         total_accuracy = 0
@@ -639,6 +655,8 @@ class TrafficSignClassifier():
     def analyzeCustomData(self, _type='custom'):
         X = None
         Y = None
+        accuracy = None
+        top_5 = ""
         if _type == 'train':
             X = self.X_test
             Y = self.y_test
@@ -658,15 +676,20 @@ class TrafficSignClassifier():
             fileToRestore = './tsc_cfg_'+str(self.id)
             tf.train.Saver().restore(sess, fileToRestore)
             self.logger.log("Restore session in {}".format(fileToRestore))
-            test_accuracy = self.__EvaluateCNN(X, Y)
-            self.logger.log("analyzeCustomData ({0}) = {1:.3f}".format(_type, test_accuracy))
+            accuracy = self.__EvaluateCNN(X, Y)
+            self.logger.log("analyzeCustomData ({0}) = {1:.3f}".format(_type, accuracy))
             if _type=='custom':
                 self.logger.log("Top K evaluation")
                 propability = tf.nn.softmax(logits=self.logits)
                 bestMatch = tf.nn.top_k(propability,5)
                 val = sess.run(bestMatch, feed_dict={self.phX: X, self.phY: Y, self.fc1_kp : 1.0, self.fc2_kp : 1.0})
                 for prop, match, label in zip(val[0], val[1], Y):
-                    self.logger.log("Label {} identified as {}, {} with propability of ({:.2f},{:.2f})".format(label, match[0], match[1], prop[0], prop[1]))
+                    top_5 += "Label {} identified as:\n{} with {:.2f}, {} with {:.2f}\n"\
+                                                "{} with {:.2f}, {} with {:.2f}\n{} with {:.2f}\n"\
+                            .format(label, match[0], prop[0], match[1], prop[1], match[2], prop[2]\
+                                    , match[3], prop[3], match[4], prop[4])
+                self.logger.log(top_5)
+        return (accuracy, top_5)
                     
 
 
@@ -829,19 +852,26 @@ if __name__ == '__main__':
     
     start = time.clock()
     TrafficSignClassifier.importData("../")
-    TrafficSignClassifier.importCustomImages("../examples", myTestimages)
+    TrafficSignClassifier.drawDataSetExample()
     
     #TrafficSignClassifier.preAnalyzeData()
     #TrafficSignClassifier.drawDataSetExample()
     #TrafficSignClassifier.dataAugmentation(1000)
     
-    TrafficSignClassifier.dataAugmentation(1500)
+    TrafficSignClassifier.dataAugmentation(15)
     log = Logger("../results.txt", True)
     finalCfg = lenet_configuration[len(lenet_configuration)-1]
-    tsc = TrafficSignClassifier(finalCfg, log.getLogger(1));
+    #tsc = TrafficSignClassifier(finalCfg, log.getLogger(1));
+    tsc = TrafficSignClassifier(finalCfg);
     tsc.normalize_zeroMeanData()
     tsc.TrainCNN(True)
-    tsc.analyzeCustomData()
+    #tsc.TrainCNN(False)
+    TrafficSignClassifier.importCustomImages("../examples", myTestimages)
+    TrafficSignClassifier.drawCustomDataSet()
+    tsc.reloadData()
+    tsc.normalize_zeroMeanData()
+    result = tsc.analyzeCustomData()
+    print("LALA", result)
     log.dump()
     print ("Time elapsed ", math.ceil((time.clock() - start)/60) )
     exit(0)
