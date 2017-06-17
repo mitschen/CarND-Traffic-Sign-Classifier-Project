@@ -26,25 +26,23 @@ The goals / steps of this project are the following:
 [image6]: ./examples/15_noEntry.bmp "Traffic Sign 3"
 [image7]: ./examples/17_oneway.bmp "Traffic Sign 4"
 [image8]: ./examples/33_turnRight.bmp "Traffic Sign 5"
+[image9]: ./examples/tsc_class.png "TrafficSignClassifier class diagram"
+[image10]: ./examples/network_architecture.graphviz.png "resulting network"
 
-## Rubric Points
-###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/481/view) individually and describe how I addressed each point in my implementation.  
 
 ---
-###Writeup / README
-
-####1. Provide a Writeup / README that includes all the rubric points and how you addressed each one. You can submit your writeup as markdown or pdf. You can use this template as a guide for writing the report. The submission includes the project code.
-
-You're reading it! and here is a link to my [project code](https://github.com/udacity/CarND-Traffic-Sign-Classifier-Project/blob/master/Traffic_Sign_Classifier.ipynb)
 
 ###TrafficSignClassifier.py overview
 The first questions I've asked myself - how to deal with the degree of freedom that is given in a CNN like the LeNet architecture. I was expecting to make a bunch of measurements, changing some parameters and rerun the test. At the end a compareable result must be summarized. In order to make my life easier, I've decided to create a solution that is not based on the structure given in the jupyter notebook template. This solution allows me to predefine different settings of parameters and run the tests single/ multithreaded in a automatic sequence e.g. over night. 
+
+![alt text][image9]
 
 The TrafficSignClassifier.py contains 3 classes (the TrafficSignClassifier and two helpers for logging) and a main function which is used to start the reading/training/verification process.  I'll concentrate on the TrafficSignClassifier - further abbreviated as TSC - only - the LoggingClasses are used to write the results to console as well as in a textfile.
 
 #####statics
 
 TSC contains some static as well as instance members. The intention behind the static members and functions is, that reading training-data as well as applying different transformations on this data should be done once, and then shared among all the configurations.
+
 
 As you can imaging: `X, Y train/valid/test/custom` contains the testdata read from the file. The `classes` member contains the association between label 0-42 and the corresponding textual representation. The class is storing an overview of the samples for each label in the `trainingLabelSetIndex` - meaning for each label I've the index to a training sample. The class member `id` is used in the multithreaded environment to associate log-outputs with the corresponding configuration setup.
 
@@ -196,7 +194,7 @@ At the end I've started my training with a sampleset of 1000 elements for each l
 
 For sure - i've only applied two different operations to the sampleset. In order to increase the "noise" you could shifting/ rotating in negative direction or by more/ less degree/ px. I didn't spend more time on that, but I'm sure the robustness of the NN could be improved by providing more variance in the sampleset.
 
-In addition to the augmentation, I spend some time in playing around with the samples itself. As we've learnt in out term, normalization of the inflow data is always a good start ;-). So I've implemented the `normalize_zeroMeanData` method. This method simply moves the average of each pixel to 0 and reduces the variance to 1. The consequence was meaningful and results in a better performance.
+In addition to the augmentation, I spend some time in playing around with the samples itself. As we've learnt in our term, normalization of the inflow data is always a good start ;-). So I've implemented the `normalize_zeroMeanData` method. This method simply moves the average of each pixel to 0 and reduces the variance to 1. The consequence was meaningful and results in a better performance.
 As the next step I've tried to play around with the colors - see `convertToGrayScale_luminosity` but the impact was disappointing so that is stopped further investigations.
 
 So in short:
@@ -207,60 +205,42 @@ improved my NN.
 
 ####1. Provide a basic summary of the data set. In the code, the analysis should be done using python, numpy and/or pandas methods rather than hardcoding results manually.
 
-I used the pandas library to calculate summary statistics of the traffic
-signs data set:
+As the initial step in each training run, the TSC is reading the test/valid/train data that was offered to us. As mentioned earlier - even though there is a hugh amount of testdata - the testdata is not distributed very well among all labels.
+>Basic Summary of the DataSet
+>	Number of training examples =  34799
+>	Number of validation examples =  4410
+>	Number of testing examples =  12630
+>	Image data shape =  (32, 32)
+>	Number of classes =  43
 
-* The size of training set is ?
-* The size of the validation set is ?
-* The size of test set is ?
-* The shape of a traffic sign image is ?
-* The number of unique classes/labels in the data set is ?
-
-####2. Include an exploratory visualization of the dataset.
-
-Here is an exploratory visualization of the data set. It is a bar chart showing how the data ...
-
-
-
-###Design and Test a Model Architecture
-
-####1. Describe how you preprocessed the image data. What techniques were chosen and why did you choose these techniques? Consider including images showing the output of each preprocessing technique. Pre-processing refers to techniques such as converting to grayscale, normalization, etc. (OPTIONAL: As described in the "Stand Out Suggestions" part of the rubric, if you generated additional data for training, describe why you decided to generate additional data, how you generated the data, and provide example images of the additional data. Then describe the characteristics of the augmented training set like number of images in the set, number of images for each class, etc.)
-
-As a first step, I decided to convert the images to grayscale because ...
-
-Here is an example of a traffic sign image before and after grayscaling.
+Furthermore as you can see in the example image below, the quality - concerning brightness and resolution isn't really that great.
 
 ![alt text][image2]
 
-As a last step, I normalized the image data because ...
+For example take label 13, 14, 15 - due to low brightness it very tough for a human to differentiate these images. 
 
-I decided to generate additional data because ... 
+###Design and Test a Model Architecture
 
-To add more data to the the data set, I used the following techniques because ... 
+As motivated in the section **TrafficSignClassifier.py overview** the first problem I wanted to address is to manage this high amount of degrees of freedom. During the development of the TrafficSignClassifier I already sheduled some testruns using the classical LeNet architecture - therefore I've decided to stay with this approach and enrich it by some additional measurements to reach better matching rate while lowering the overfitting risk.
 
-Here is an example of an original image and an augmented image:
+One of the first steps I've made good experience with is the preprocessing of data I've described above. Augmentation of the data, aligning sample size and normalization to zero mean already increased fitting rate.
 
-![alt text][image3]
+But as you can see below in the table, the classical LeNet architecture (Cfg7) wasn't proper designed to classify traffic signs. The major problem was, that the depth of the Convolutions were too small. The traffic signs offers much more features than the handwritten digits (concerning shape, color, edges...). So I decided very early to add another configurations which starts with a much higher depth like e.g. Cfg8 or Cfg1. With this adaptation I've almost reached the goal. 
 
-The difference between the original data set and the augmented data set is the following ... 
+Refering to the [paper](http://yann.lecun.com/exdb/publis/pdf/sermanet-ijcnn-11.pdf) provided in the jupyter notebook, I increased the depth to a top of 128 - see e.g. Cfg3. But the result is compareable to configurations before (with smaller depths) so I dropped this approach.
+
+As a next approach I've played around with the convultion depth itself - meaning adding another convolution layer. The question I was thinking about was - maybe two cnn aren't enought to merge abstract features to a more meaningful feature. So I adjusted the TrafficSignClassifier class in order to optionally add an another cnn layer. I was facing very fast the situation, that the output shape of the second cnn was already small - a third convolution on top will reduce it more. As a result - the input of the fully connected layers will decrease as well. My fear at this point was, by reducing the input to the fully connected, will I loose the ability to recognize enough abstract features? As you can see in the testruns Cfg5, Cfg6 and Cfg12 - this was not the case. The accuracy of training was already above the requested 0.93 percent. 
+
+A major problem I was facing all the time was the problem, that the training accuracy was almost fine, but applying the resulting network on the testing data always results in a noticeable drop of the accuracy. I've reduced this problem by adding two dropout layers right behind fully connected 1 and 2.
+
+So at the end, my testconfigurations I was working consists of:
+* 2 to 3 convolutional layers
+* 2 to 3 max-pool layers
+* 3 fully connected layers
+* 2 drop out layers between FC1 and FC2
 
 
-####2. Describe what your final model architecture looks like including model type, layers, layer sizes, connectivity, etc.) Consider including a diagram and/or table describing the final model.
-
-My final model consisted of the following layers:
-
-| Layer         		|     Description	        					| 
-|:---------------------:|:---------------------------------------------:| 
-| Input         		| 32x32x3 RGB image   							| 
-| Convolution 3x3     	| 1x1 stride, same padding, outputs 32x32x64 	|
-| RELU					|												|
-| Max pooling	      	| 2x2 stride,  outputs 16x16x64 				|
-| Convolution 3x3	    | etc.      									|
-| Fully connected		| etc.        									|
-| Softmax				| etc.        									|
-|						|												|
-|						|												|
-
+###Testruns
 
 Please note: If not explicitly mentioned I've used for convolution filters always a stride of (1,1,1,1) while for the max pooling a stride of (1,2,2,1). The arrow in the table `<-` shall indicate the same setup as in the column to the left.
 
@@ -311,41 +291,61 @@ One of the first suggestions when not reaching a good accuracy was to adjust the
 | Accuracy Testing | - | 0.924 | 0.938 |  0.930 | 0.936 | 0.937 |
 
 
+###Result and decision
+As result of the different tests I've made, I decided to choose an architecture very close to the LeNet architecture - *Cfg1*.
 
-####3. Describe how you trained your model. The discussion can include the type of optimizer, the batch size, number of epochs and any hyperparameters such as learning rate.
+![alt text][image10]
 
-To train the model, I used an ....
+It consists of two convolutional layers with a filter of 5x5 3->32 and 5x5 32->43. Three fully connected layers are following these convolutions and result in a output of 43 labels. As in LeNet, the loss is the cross entropy of our results and the labels as OneHot encoded. I chose this architecture because it provides good results with a moderate consumption of resource - even though the resource consumption is negligible since it is only relevant for training.
 
-####4. Describe the approach taken for finding a solution and getting the validation set accuracy to be at least 0.93. Include in the discussion the results on the training, validation and test sets and where in the code these were calculated. Your approach may have been an iterative process, in which case, outline the steps you took to get to the final solution and why you chose those steps. Perhaps your solution involved an already well known implementation or architecture. In this case, discuss why you think the architecture is suitable for the current problem.
+A few words concerning number of epochs and learning rate: I measured in some cases that by increasing the number of epochs I was able to achieve better matching results - this didn't apply for the chosen configuration Cfg1 which was at its max accuracy right after epoch count of 10.
+Furthermore I've changed the learning rate - that was one of the first suggestions learnt in the term. But as you can see, the impact is not noticeable.
 
-My final model results were:
-* training set accuracy of ?
-* validation set accuracy of ? 
-* test set accuracy of ?
+The final result I've achieved with the jupyter notebook export is as following:
+>EPOCH 1 ...
+>Instance 1: Validation Accuracy = 0.772
+>EPOCH 2 ...
+>Instance 1: Validation Accuracy = 0.870
+>EPOCH 3 ...
+>Instance 1: Validation Accuracy = 0.900
+>EPOCH 4 ...
+>Instance 1: Validation Accuracy = 0.928
+>EPOCH 5 ...
+>Instance 1: Validation Accuracy = 0.934
+>EPOCH 6 ...
+>Instance 1: Validation Accuracy = 0.952
+>EPOCH 7 ...
+>Instance 1: Validation Accuracy = 0.944
+>EPOCH 8 ...
+>Instance 1: Validation Accuracy = 0.950
+>EPOCH 9 ...
+>Instance 1: Validation Accuracy = 0.958
+>EPOCH 10 ...
+>Instance 1: Validation Accuracy = 0.965
+>EPOCH 11 ...
+>Instance 1: Validation Accuracy = 0.954
+>EPOCH 12 ...
+>Instance 1: Validation Accuracy = 0.960
+>EPOCH 13 ...
+>Instance 1: Validation Accuracy = 0.960
+>EPOCH 14 ...
+>Instance 1: Validation Accuracy = 0.964
+>EPOCH 15 ...
+>Instance 1: Validation Accuracy = **0.947**
+>Instance 1: On testdata we're achieving accuracy = **0.939**
 
-If an iterative approach was chosen:
-* What was the first architecture that was tried and why was it chosen?
-* What were some problems with the initial architecture?
-* How was the architecture adjusted and why was it adjusted? Typical adjustments could include choosing a different model architecture, adding or taking away layers (pooling, dropout, convolution, etc), using an activation function or changing the activation function. One common justification for adjusting an architecture would be due to overfitting or underfitting. A high accuracy on the training set but low accuracy on the validation set indicates over fitting; a low accuracy on both sets indicates under fitting.
-* Which parameters were tuned? How were they adjusted and why?
-* What are some of the important design choices and why were they chosen? For example, why might a convolution layer work well with this problem? How might a dropout layer help with creating a successful model?
 
-If a well known architecture was chosen:
-* What architecture was chosen?
-* Why did you believe it would be relevant to the traffic sign application?
-* How does the final model's accuracy on the training, validation and test set provide evidence that the model is working well?
  
 
 ###Test a Model on New Images
 
 ####1. Choose five German traffic signs found on the web and provide them in the report. For each image, discuss what quality or qualities might be difficult to classify.
 
-Here are five German traffic signs that I found on the web:
+I've taken some pictures in my sourrounding for this testsetup
 
-![alt text][image4] ![alt text][image5] ![alt text][image6] 
-![alt text][image7] ![alt text][image8]
+![alt text][image4] ![alt text][image5] ![alt text][image6]![alt text][image7] ![alt text][image8]
 
-The first image might be difficult to classify because ...
+I've adjusted the pictures in the orientation (not all in the middle of the image). 
 
 ####2. Discuss the model's predictions on these new traffic signs and compare the results to predicting on the test set. At a minimum, discuss what the predictions were, the accuracy on these new predictions, and compare the accuracy to the accuracy on the test set (OPTIONAL: Discuss the results in more detail as described in the "Stand Out Suggestions" part of the rubric).
 
@@ -353,33 +353,56 @@ Here are the results of the prediction:
 
 | Image			        |     Prediction	        					| 
 |:---------------------:|:---------------------------------------------:| 
-| Stop Sign      		| Stop sign   									| 
-| U-turn     			| U-turn 										|
-| Yield					| Yield											|
-| 100 km/h	      		| Bumpy Road					 				|
-| Slippery Road			| Slippery Road      							|
+| ![alt text][image4]    		| Yield sign   									| 
+| ![alt text][image5]     			| Stop sign 										|
+| ![alt text][image6]				| No vehicles											|
+| ![alt text][image7]	      		| No entry					 				|
+| ![alt text][image8]			| **ERROR** ++Go straight or left++  instead of Turn right ahead    							|
 
 
-The model was able to correctly guess 4 of the 5 traffic signs, which gives an accuracy of 80%. This compares favorably to the accuracy on the test set of ...
+The model was able to correctly guess 4 of the 5 traffic signs, which gives an accuracy of 80%. 
+
+I was really suprised that the sample for label 33 was not classified correct. From the example pictures I've dumped (see provide a basic summary of the dataset) I've expected to run into problems with yield, stop or no vehicles. But the Turn right ahead was looking for me quiet clear.  
 
 ####3. Describe how certain the model is when predicting on each of the five new images by looking at the softmax probabilities for each prediction. Provide the top 5 softmax probabilities for each image along with the sign type of each probability. (OPTIONAL: as described in the "Stand Out Suggestions" part of the rubric, visualizations can also be provided such as bar charts)
 
-The code for making predictions on my final model is located in the 11th cell of the Ipython notebook.
-
-For the first image, the model is relatively sure that this is a stop sign (probability of 0.6), and the image does contain a stop sign. The top five soft max probabilities were
+For the yield sign the classifier wasn't 100 sure, while for all other signs, except Turn right ahead, the classifier works with a reliable accuracy.
+The suprising Turn right ahead which wasn't event in the top 5 list. More crazy is the fact that the classifier provides a 99%+ rate for the "Go straight or left".
 
 | Probability         	|     Prediction	        					| 
 |:---------------------:|:---------------------------------------------:| 
-| .60         			| Stop sign   									| 
-| .20     				| U-turn 										|
-| .05					| Yield											|
-| .04	      			| Bumpy Road					 				|
-| .01				    | Slippery Road      							|
+| .66         			| Yield sign   									| 
+| .96     				| Stop sign										|
+| .99+					| No vehicles									|
+| .99+	      			| No entry					 			        |
+| .00				    | Turn right ahead      					    |
 
 
-For the second image ... 
+The top 5 results of the customer images
 
-### (Optional) Visualizing the Neural Network (See Step 4 of the Ipython notebook for more details)
-####1. Discuss the visual output of your trained network's feature maps. What characteristics did the neural network use to make classifications?
+| Image | Top5 labels |
+|:-:|:-:|
+|![alt text][image4]  | 13 with 0.66, 14 with 0.34 12 with 0.00, 1 with 0.00 26 with 0.00 |
+|![alt text][image5]  | 14 with 0.96, 17 with 0.04 12 with 0.00, 29 with 0.00 10 with 0.00| 
+|![alt text][image6]  | 15 with 1.00, 13 with 0.00 9 with 0.00, 3 with 0.00 2 with 0.00|
+|![alt text][image7]  | 17 with 1.00, 14 with 0.00 26 with 0.00, 18 with 0.00 30 with 0.00|
+|![alt text][image8]  | **37 with 1.00**, 39 with 0.00 40 with 0.00, 20 with 0.00 38 with 0.00|
+
+### Summary and outlook
+In this document I've provided an overview about my solution for the TrafficSignClassifier project. I've developed a class which allows me to setup different shapes of classifiers and run them in a batch like sequence. As basis for my classifier architecture I've reused the approach of LeNet.
+The TrafficSignClassifier is applying different preprocessings on the training data (e.g. rotating images, normalize values) before it is used for training the network.
+I've compared different network (difference in filter-shape, convolution depth, ...) and decided to use more or less the LeNet configuration enriched by dropouts and adapted by higher depth in the filters of convolutions. As a result i've reached an accuracy of 0.95 on validation data and about 0.94 on test data.
+Applying the classifier on my custom images results in a accuracy of 0.8 percent. Suprisingly one sign was completely mismatched.
+
+I'm very sure the performance of the chosen architecture could be improved more. One of the first steps to do is in my point of view to analyze the training samples in more details. The testresult of my custom data shows that some basic features (is the arrow in the sign pointing to left or right) aren't represent in the fully connected layers. By analysis of the testdata - especially for lable 33 and 37 should give a better understanding why.
+
+Another topic which maybe should be taken into consideration is the color space of the samples. During my tests I was really suprised that a grayscaled image did not perform better than a color image - grayscale would reduce the number of features I want my NN to take care of.
+
+And last but not least the 3-layered convolution shows a good performance as well. Maybe the paramters aren't optimized at this moment. I guess by visualization of the convolution output it should be possible to find a more reliable architecture for the classifier.
+
+
+
+
+
 
 
